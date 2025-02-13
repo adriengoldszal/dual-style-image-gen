@@ -1,0 +1,2 @@
+encode_text,decode_text,clip,dclip,psnr,ssim,l2
+A black bear is walking in the grass.,A monet style painting of a black bear walking in the grass.,0.4087006449699402,0.27065908908843994,18.40060806274414,0.6399169847131149,106.61054229736328

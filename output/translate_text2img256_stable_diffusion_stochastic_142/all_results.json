@@ -1,0 +1,15 @@
+{
+    "_runtime": 104,
+    "_timestamp": 1739271164,
+    "eval/avr": 25.266085415775784,
+    "eval/runtime": 87.2944,
+    "eval/samples_per_second": 0.011,
+    "eval/steps_per_second": 0.011,
+    "eval/translate/clip": 0.4087006449699402,
+    "eval/translate/d-clip": 0.27065908908843994,
+    "eval/translate/l2": 106.61054229736328,
+    "eval/translate/psnr": 18.40060806274414,
+    "eval/translate/ssim": 0.6399169847131149,
+    "eval/weighted_loss": 0.0,
+    "eval_samples": 1
+}
