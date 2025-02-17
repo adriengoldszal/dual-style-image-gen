@@ -1,9 +1,7 @@
 import logging
 import os
 
-import torch
 import datasets
-import transformers
 from transformers import (
     HfArgumentParser,
     set_seed,
@@ -92,7 +90,7 @@ def main():
     # Initialize model.
     model = get_model(args.model.name)(args)
 
-    # Initialize Trainer.
+    # Initialize Trainer, only used for eval anyway
     trainer = Trainer(
         args=training_args,
         model=model,
@@ -104,26 +102,6 @@ def main():
     )
     print(f'Rank {training_args.local_rank} Trainer build successfully.')
 
-    if training_args.resume_from_checkpoint:
-        state_dict = torch.load(
-            os.path.join(training_args.resume_from_checkpoint, transformers.WEIGHTS_NAME),
-            map_location="cpu",
-        )
-        trainer.model.load_state_dict(state_dict, strict=True)
-        # Free memory
-        del state_dict
-
-    # Training
-    if training_args.do_train:
-        metrics = trainer.train()
-        trainer.save_model()
-
-        metrics["train_samples"] = len(dataset_splits['train'])
-
-        trainer.log_metrics("train", metrics)
-        trainer.save_metrics("train", metrics)
-        trainer.save_state()
-
     # Evaluation after training
     logger.info("*** Evaluate ***")
 
@@ -134,19 +112,6 @@ def main():
 
     trainer.log_metrics("eval", metrics)
     trainer.save_metrics("eval", metrics)
-
-    # Test
-    if training_args.do_predict:
-        logger.info("*** Predict ***")
-
-        metrics = trainer.predict(
-            test_dataset=dataset_splits['test'],
-            metric_key_prefix="test",
-        )
-        metrics["predict_samples"] = len(dataset_splits['test'])
-
-        trainer.log_metrics("predict", metrics)
-        trainer.save_metrics("predict", metrics)
 
 
 if __name__ == "__main__":
