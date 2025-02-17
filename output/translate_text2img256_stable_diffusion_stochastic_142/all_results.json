@@ -1,8 +1,8 @@
 {
-    "_runtime": 104,
-    "_timestamp": 1739804614,
+    "_runtime": 103,
+    "_timestamp": 1739806017,
     "eval/avr": 34.0438956251946,
-    "eval/runtime": 86.8321,
+    "eval/runtime": 85.678,
     "eval/samples_per_second": 0.012,
     "eval/steps_per_second": 0.012,
     "eval/translate/clip": 0.4005042016506195,
