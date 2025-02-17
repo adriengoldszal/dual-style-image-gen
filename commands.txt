@@ -30,6 +30,6 @@ python -m torch.distributed.run \
     --output_dir output/$RUN_NAME$SEED \
     --overwrite_output_dir \
     --per_device_train_batch_size 1 \
-    --per_device_eval_batch_size 4 \
+    --per_device_eval_batch_size 1 \
     --eval_accumulation_steps 4 \
     --verbose true

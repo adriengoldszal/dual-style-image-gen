@@ -1,7 +1,7 @@
 [
     {
         "encode_text": "A black bear is walking in the grass.",
-        "decode_text": "A van-gogh style painting of a black bear walking in the grass.",
+        "decode_text": "A van gogh style painting of a black bear walking in the grass.",
         "img_path": "./data/prompt2prompt/bear.png"
     }
 ]
