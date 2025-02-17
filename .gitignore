@@ -135,3 +135,6 @@ Temporary Items
 
 # Diffusion models
 ckpts/stable_diffusion
+
+# WandB
+wandb/
