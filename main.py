@@ -87,7 +87,7 @@ def main():
     # Initialize visualizer.
     visualizer = get_visualizer(args.visualization.visualizer_program)(args)
 
-    # Initialize model.
+    # Initialize model : text_unsupervised_translation
     model = get_model(args.model.name)(args)
 
     # Initialize Trainer, only used for eval anyway
@@ -119,5 +119,3 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     main()
-    # from time import sleep
-    # sleep(3600 * 48)

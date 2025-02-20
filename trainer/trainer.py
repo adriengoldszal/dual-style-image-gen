@@ -418,8 +418,10 @@ class Trainer:
 
         """
         self._prepare_inputs(inputs)
-
+        
+        logger.info('***Doing a prediction step***')
         with torch.no_grad():
+            # Calls the forward method of text_unsupervised_translation
             images, weighted_loss, losses = self.model(**inputs)
 
         return images, weighted_loss, losses
@@ -437,7 +439,6 @@ class Trainer:
             """
 
             batch_size = dataloader.batch_size
-
             logger.info(f"***** Running {description} *****")
             if isinstance(dataloader.dataset, collections.abc.Sized):
                 logger.info(f"  Num examples = {len(dataloader.dataset)}")
@@ -469,18 +470,6 @@ class Trainer:
                     prediction_outputs if prediction_outputs_host is None else
                     nested_concat(prediction_outputs_host, prediction_outputs, padding_index=-100)
                 )
-
-                # Gather all tensors and put them back on the CPU if we have done enough accumulation steps.
-                if self.args.eval_accumulation_steps is not None and (step + 1) % self.args.eval_accumulation_steps == 0:
-                    if prediction_outputs_host is not None:
-                        prediction_outputs = nested_cpu(prediction_outputs_host)
-                        all_prediction_outputs = (
-                            prediction_outputs if all_prediction_outputs is None else
-                            nested_concat(all_prediction_outputs, prediction_outputs, padding_index=-100)
-                        )
-
-                    # Set back to None to begin a new accumulation
-                    prediction_outputs_host = None
 
             # Gather all remaining tensors and put them back on the CPU
             if prediction_outputs_host is not None:
