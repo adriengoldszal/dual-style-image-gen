@@ -17,25 +17,11 @@ class Preprocessor(object):
 
     def preprocess(self, raw_datasets: DatasetDict, cache_root: str):
         assert len(raw_datasets) == 3  # Not always.
-        train_dataset = TrainDataset(self.args, self.meta_args, raw_datasets['train'], cache_root)
         dev_dataset = DevDataset(self.args, self.meta_args, raw_datasets['validation'], cache_root)
 
         return {
-            'train': train_dataset,
             'dev': dev_dataset,
         }
-
-
-class TrainDataset(Dataset):
-
-    def __init__(self, args, meta_args, raw_datasets, cache_root):
-        self.data = []
-
-    def __getitem__(self, index):
-        raise NotImplementedError()
-
-    def __len__(self):
-        return len(self.data)
 
 
 class DevDataset(Dataset):
