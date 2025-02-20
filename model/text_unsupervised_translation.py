@@ -28,6 +28,8 @@ class TextUnsupervisedTranslation(nn.Module):
         assert not self.training
 
         z_ensemble = self.gan_wrapper.encode(image=original_image, encode_text=encode_text)
+        
+        # Calls the forward method of stable_diffusion_stochastic_text_wrapper
         img = self.gan_wrapper(z_ensemble=z_ensemble,
                                original_img=original_image,
                                encode_text=encode_text,

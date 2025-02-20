@@ -1,5 +1,6 @@
 import logging
 import os
+import torch
 
 import datasets
 from transformers import (
@@ -95,7 +96,6 @@ def main():
         args=training_args,
         model=model,
         compute_metrics=evaluator.evaluate,
-        train_dataset=dataset_splits['train'],
         eval_dataset=dataset_splits['dev'],
         visualizer=visualizer,
         wandb_run_dir=wandb_run_dir,

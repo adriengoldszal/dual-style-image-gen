@@ -148,7 +148,6 @@ class Trainer:
                  args,
                  model,
                  compute_metrics,
-                 train_dataset,
                  eval_dataset,
                  visualizer,
                  wandb_run_dir=None,
@@ -161,7 +160,6 @@ class Trainer:
         self.output_interval = 50
         self.model = model
         self.compute_metrics = compute_metrics
-        self.train_dataset = train_dataset
         self.eval_dataset = eval_dataset
         self.visualizer = visualizer
         self.wandb_run_dir = wandb_run_dir
@@ -419,9 +417,10 @@ class Trainer:
         """
         self._prepare_inputs(inputs)
         
-        logger.info('***Doing a prediction step***')
+        logger.info('\n ***Doing a prediction step***')
         with torch.no_grad():
             # Calls the forward method of text_unsupervised_translation
+            # images is the tuple (input_img, generated_img)
             images, weighted_loss, losses = self.model(**inputs)
 
         return images, weighted_loss, losses
@@ -460,7 +459,8 @@ class Trainer:
 
             # Main evaluation loop
             for step, inputs in tqdm(enumerate(dataloader)):
-                # Prediction step
+                
+                # Prediction step : getting the new image
                 prediction_outputs = self.prediction_step(inputs)
 
                 # Update containers on host
