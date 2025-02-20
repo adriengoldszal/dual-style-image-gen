@@ -150,7 +150,6 @@ class Trainer:
                  compute_metrics,
                  eval_dataset,
                  visualizer,
-                 wandb_run_dir=None,
                  ):
 
         # force device and distributed setup init explicitly
@@ -162,7 +161,6 @@ class Trainer:
         self.compute_metrics = compute_metrics
         self.eval_dataset = eval_dataset
         self.visualizer = visualizer
-        self.wandb_run_dir = wandb_run_dir
 
         # Build training state tracker.
         self.state = TrainerState()
@@ -229,9 +227,6 @@ class Trainer:
 
         output = {**logs, **{"step": self.state.global_step}}
         self.state.log_history.append(output)
-
-        # wandb
-        wandb.log(logs)
         
     def metrics_format(self, metrics: Dict[str, float]) -> Dict[str, float]:
         """

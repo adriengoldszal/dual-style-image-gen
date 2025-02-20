@@ -38,26 +38,6 @@ def get_dataset_splits(args):
 
     return get_multi_task_dataset_splits(meta_args=args, name2dataset_splits=name2dataset_splits)
 
-
-def setup_wandb(training_args):
-    if "wandb" in training_args.report_to and training_args.local_rank <= 0:
-        import wandb
-
-        # init_args = {}
-        # if "MLFLOW_EXPERIMENT_ID" in os.environ:
-        #     init_args["group"] = os.environ["MLFLOW_EXPERIMENT_ID"]
-        wandb.init(
-            project=os.getenv("WANDB_PROJECT", "your project name"),
-            name=training_args.run_name,
-            entity=os.getenv("WANDB_ENTITY", 'your entity'),
-        )
-        wandb.config.update(training_args, allow_val_change=True)
-
-        return wandb.run.dir
-    else:
-        return None
-
-
 def main():
 
     # Get training_args and args.
@@ -76,8 +56,6 @@ def main():
     # torch.use_deterministic_algorithms(True)
     # cudnn.deterministic = True
 
-    # Set up wandb.
-    wandb_run_dir = setup_wandb(training_args)
     # Setup output directory.
     os.makedirs(training_args.output_dir, exist_ok=True)
     args.output_dir = training_args.output_dir
@@ -98,7 +76,6 @@ def main():
         compute_metrics=evaluator.evaluate,
         eval_dataset=dataset_splits['dev'],
         visualizer=visualizer,
-        wandb_run_dir=wandb_run_dir,
     )
     print(f'Rank {training_args.local_rank} Trainer build successfully.')
 
