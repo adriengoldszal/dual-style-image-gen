@@ -30,7 +30,7 @@ class TextUnsupervisedTranslation(nn.Module):
         z_ensemble = self.gan_wrapper.encode(image=original_image, encode_text=encode_text)
         
         # Calls the forward method of stable_diffusion_stochastic_text_wrapper
-        img = self.gan_wrapper(z_ensemble=z_ensemble,
+        img, intermediates = self.gan_wrapper(z_ensemble=z_ensemble,
                                original_img=original_image,
                                encode_text=encode_text,
                                decode_text=decode_text)
@@ -39,7 +39,7 @@ class TextUnsupervisedTranslation(nn.Module):
         losses = dict()
         weighted_loss = torch.zeros_like(sample_id).float()
 
-        return (original_image, img), weighted_loss, losses
+        return (original_image, img, intermediates), weighted_loss, losses
 
     @property
     def device(self):

@@ -1,13 +1,13 @@
 {
-    "eval/avr": 34.32087354150569,
-    "eval/runtime": 25.4285,
-    "eval/samples_per_second": 0.039,
-    "eval/steps_per_second": 0.039,
-    "eval/translate/clip": 0.40390604734420776,
-    "eval/translate/d-clip": 0.24192482233047485,
-    "eval/translate/l2": 155.260498046875,
-    "eval/translate/psnr": 15.135392189025879,
-    "eval/translate/ssim": 0.5626466019528856,
+    "eval/avr": 30.172869444552987,
+    "eval/runtime": 28.7279,
+    "eval/samples_per_second": 0.035,
+    "eval/steps_per_second": 0.035,
+    "eval/translate/clip": 0.4012662172317505,
+    "eval/translate/d-clip": 0.2162128984928131,
+    "eval/translate/l2": 133.2697296142578,
+    "eval/translate/psnr": 16.46198081970215,
+    "eval/translate/ssim": 0.5151576730803967,
     "eval/weighted_loss": 0.0,
     "eval_samples": 1
 }

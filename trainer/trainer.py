@@ -196,13 +196,14 @@ class Trainer:
             if isinstance(v, torch.Tensor):
                 inputs[k] = v.to(self.args.device)
                 
-    def visualize(self, images, description):
+    def visualize(self, images,intermediates, description):
         if not self.is_world_process_zero():
             return
 
         save_dir = self.args.output_dir
         self.visualizer.visualize(
             images=images,
+            intermediates=intermediates,
             model=self.model.module,
             description=description,
             save_dir=save_dir,
@@ -456,6 +457,7 @@ class Trainer:
             for step, inputs in tqdm(enumerate(dataloader)):
                 
                 # Prediction step : getting the new image
+                print(f'At step {step} in trainer evaluation loop')
                 prediction_outputs = self.prediction_step(inputs)
 
                 # Update containers on host
@@ -482,12 +484,12 @@ class Trainer:
             if all_prediction_outputs is not None:
                 all_prediction_outputs = nested_truncate(all_prediction_outputs, num_samples)
 
-            images, weighted_loss, losses = all_prediction_outputs
+            (original_img, img, intermediates) , weighted_loss, losses = all_prediction_outputs
 
             # Metrics!
             if self.is_world_process_zero():
                 if self.compute_metrics and all_prediction_outputs:
-                    metrics = self.compute_metrics(images,
+                    metrics = self.compute_metrics((original_img, img),
                                                 self.model.module,
                                                 weighted_loss,
                                                 losses,
@@ -511,7 +513,7 @@ class Trainer:
                     metrics[f"{metric_key_prefix}/{key}"] = value.mean(0).item()
 
                 # Save images.
-                self.visualize(images, description)
+                self.visualize(images=(original_img, img),intermediates=intermediates, description=description)
             else:
                 metrics = None
 
