@@ -51,7 +51,8 @@ def convsample_ddim_conditional(model, steps, shape, x_T, skip_steps, eta, eps_l
                                                   x_T=x_T,
                                                   skip_steps=skip_steps,
                                                   unconditional_guidance_scale=scale,
-                                                  unconditional_conditioning=uc
+                                                  unconditional_conditioning=uc,
+                                                  log_every_t=10,
                                                   )
     return samples, intermediates
 
@@ -68,10 +69,36 @@ def make_convolutional_sample_with_eps_conditional(model, custom_steps, eta, x_T
                                                             eps_list=eps_list,
                                                             scale=scale,
                                                             text=text)
-
+    
+    
+    print(f'In the SDS Wrapper:')
+    print(f'- sample shape: {sample.shape}')
+    print(f'- intermediates x_inter length: {len(intermediates["x_inter"])}')
+    print(f'- intermediates x_inter[0] shape: {intermediates["x_inter"][0].shape}')
+    print(f'- intermediates pred_x0 length: {len(intermediates["pred_x0"])}')
+    print(f'- intermediates pred_x0[0] shape: {intermediates["pred_x0"][0].shape}')
+    
     x_sample = model.decode_first_stage(sample)
+    print(f'After decode_first_stage x_sample {x_sample.shape}')
+    
+    #We also decode the rest to be able to get them
+    decoded_x_inter = []
+    for x_t in intermediates['x_inter']:
+        decoded_x_t = model.decode_first_stage(x_t)
+        decoded_x_inter.append(decoded_x_t)
 
-    return x_sample
+    # Decode all predicted x_0 states    
+    decoded_pred_x0 = []
+    for x_0 in intermediates['pred_x0']:
+        decoded_x_0 = model.decode_first_stage(x_0)
+        decoded_pred_x0.append(decoded_x_0)
+
+    decoded_intermediates = {
+        'x_inter': decoded_x_inter,
+        'pred_x0': decoded_pred_x0
+    }
+
+    return x_sample, decoded_intermediates
 
 
 def ddpm_ddim_encoding_conditional(model, steps, shape, eta, white_box_steps, skip_steps, x0, scale, text):
@@ -144,6 +171,7 @@ class SDStochasticTextWrapper(torch.nn.Module):
         precision_scope = autocast if self.precision == "autocast" else nullcontext
         with precision_scope("cuda"):
             img_ensemble = []
+            intermediates_ensemble = []
             for i, z in enumerate(z_ensemble):
                 skip_steps = self.skip_steps[i % len(self.skip_steps)]
                 bsz = z.shape[0]
@@ -156,7 +184,7 @@ class SDStochasticTextWrapper(torch.nn.Module):
                 # Uses the same epsilons for decoding !
 
                 for decoder_unconditional_guidance_scale in self.decoder_unconditional_guidance_scales:
-                    img = make_convolutional_sample_with_eps_conditional(self.generator,
+                    img, decoded_intermediates = make_convolutional_sample_with_eps_conditional(self.generator,
                                                                          custom_steps=self.custom_steps,
                                                                          eta=self.eta,
                                                                          x_T=x_T,
@@ -165,8 +193,9 @@ class SDStochasticTextWrapper(torch.nn.Module):
                                                                          scale=decoder_unconditional_guidance_scale,
                                                                          text=decode_text)
                     img_ensemble.append(img)
+                    intermediates_ensemble.append(decoded_intermediates)
 
-        return img_ensemble
+        return img_ensemble, intermediates_ensemble
 
     def encode(self, image, encode_text):
         # Eval mode for the generator.
@@ -212,44 +241,18 @@ class SDStochasticTextWrapper(torch.nn.Module):
         # Eval mode for the generator.
         self.generator.eval()
 
-        img_ensemble = self.generate(z_ensemble, decode_text)
+        img_ensemble, intermediates_ensemble = self.generate(z_ensemble, decode_text)
         assert len(img_ensemble) == len(self.decoder_unconditional_guidance_scales) * len(self.encoder_unconditional_guidance_scales) * len(self.skip_steps) * self.n_trials
 
         # Post process.
-        img_ensemble = [self.post_process(img) for img in img_ensemble]
+        img = self.post_process(img_ensemble[0])  # Just take the first (and only) image
+    
+        processed_intermediates = {
+            'x_inter': [self.post_process(x) for x in intermediates_ensemble[0]['x_inter']],
+            'pred_x0': [self.post_process(x) for x in intermediates_ensemble[0]['pred_x0']]
+        }
 
-        # Rank with directional CLIP score.
-        score_ensemble = []
-        for img in img_ensemble:
-            _, dclip_score = self.directional_clip(img, original_img, encode_text, decode_text)
-            assert dclip_score.shape == (img.shape[0],)
-
-            score_ensemble.append(dclip_score)
-        score_ensemble = torch.stack(score_ensemble, dim=1)  # (bsz, n_trials)
-        assert score_ensemble.shape == (img_ensemble[0].shape[0], len(img_ensemble))
-
-        best_idx = torch.argmax(score_ensemble, dim=1)  # (bsz,)
-        bsz = score_ensemble.shape[0]
-        img = torch.stack(
-            [
-                img_ensemble[best_idx[b].item()][b] for b in range(bsz)
-            ],
-            dim=0,
-        )
-        print('best scales:')
-        best_idx = best_idx % (len(self.decoder_unconditional_guidance_scales) * len(self.encoder_unconditional_guidance_scales) * len(self.skip_steps))
-        print(
-            [
-                (
-                    self.encoder_unconditional_guidance_scales[_best_idx // (len(self.decoder_unconditional_guidance_scales) * len(self.skip_steps))],
-                    self.decoder_unconditional_guidance_scales[_best_idx % (len(self.decoder_unconditional_guidance_scales) * len(self.skip_steps)) // len(self.skip_steps)],
-                    self.skip_steps[_best_idx % len(self.skip_steps)],
-                )
-                for _best_idx in best_idx
-            ]
-        )
-
-        return img
+        return img, processed_intermediates
 
     @property
     def device(self):

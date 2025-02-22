@@ -26,7 +26,9 @@ def get_dataset_splits(args):
             path=task_args.raw_data.data_program,
             cache_dir=task_args.raw_data.data_cache_dir,
         )
+        # Crée une instance de preprocessor de translate_text512.py
         task_preprocessor = get_preprocessor(task_args.preprocess.preprocess_program)
+        # Crée notre instance de devdataset (aussi dans translate_text512.py)
         task_dataset_splits = task_preprocessor(task_args, args).preprocess(task_raw_data_splits, cache_root)
 
         name2dataset_splits[name] = task_dataset_splits
@@ -35,6 +37,16 @@ def get_dataset_splits(args):
             print(f"Dataset: {name}")
             for split_name, split_data in splits.items():
                 print(f"  Split: {split_name}, Size: {len(split_data)}")
+                for i in range(len(split_data)):
+                    example = split_data[i]
+                    print(f"\nExample {i}:")
+                    print(f"Encode text: {example['encode_text']}")
+                    print(f"Decode text: {example['decode_text']}")
+                    if 'original_image' in example:
+                        img = example['original_image']
+                        if torch.is_tensor(img):
+                            print(f"Image shape: {img.shape}")
+                            print(f"Image type: {img.dtype}")
 
     return get_multi_task_dataset_splits(meta_args=args, name2dataset_splits=name2dataset_splits)
 

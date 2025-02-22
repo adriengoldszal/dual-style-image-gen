@@ -1,2 +1,2 @@
 encode_text,decode_text,clip,dclip,psnr,ssim,l2
-A black bear is walking in the grass.,A van gogh style painting of a black bear walking in the grass.,0.40390604734420776,0.24192482233047485,15.135392189025879,0.5626466019528856,155.260498046875
+A black bear is walking in the grass.,A minecraft style painting of a black bear walking in the grass.,0.4012662172317505,0.2162128984928131,16.46198081970215,0.5151576730803967,133.2697296142578
