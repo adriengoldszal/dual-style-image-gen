@@ -172,15 +172,20 @@ class SDStochasticTextWrapper(torch.nn.Module):
         with precision_scope("cuda"):
             img_ensemble = []
             intermediates_ensemble = []
+            print(f' Z_ensemble shape {len(z_ensemble)}')
             for i, z in enumerate(z_ensemble):
                 skip_steps = self.skip_steps[i % len(self.skip_steps)]
                 bsz = z.shape[0]
+                print(f'z shape {z.shape},bsz {bsz}')
                 if self.white_box_steps != -1:
                     eps_list = z.view(bsz, (self.white_box_steps - skip_steps), self.generator.channels, self.generator.image_size, self.generator.image_size)
                 else:
                     eps_list = z.view(bsz, 1, self.generator.channels, self.generator.image_size, self.generator.image_size)
                 x_T = eps_list[:, 0]
                 eps_list = eps_list[:, 1:]
+                print(f'eps_list shape after view: {eps_list.shape}')
+                print(f'x_T shape: {x_T.shape}')
+                print(f'eps_list shape after slicing: {eps_list.shape}')
                 # Uses the same epsilons for decoding !
 
                 for decoder_unconditional_guidance_scale in self.decoder_unconditional_guidance_scales:

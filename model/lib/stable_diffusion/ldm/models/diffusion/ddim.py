@@ -398,8 +398,10 @@ class DDIMSampler(object):
                                mask=None, x0=None, img_callback=None, log_every_t=100,
                                temperature=1., noise_dropout=0., score_corrector=None, corrector_kwargs=None,
                                unconditional_guidance_scale=1., unconditional_conditioning=None, ):
+        
         device = self.model.betas.device
         b = shape[0]
+        
         if x_T is None:  # x_T is x_t if using skip_steps.
             img = torch.randn(shape, device=device)
         else:
@@ -423,12 +425,12 @@ class DDIMSampler(object):
         for i, step in enumerate(iterator):
             index = refine_steps - i - 1
             ts = torch.full((b,), step, device=device, dtype=torch.long)
-
+            print(f'\nStep {i}:')
             if mask is not None:
                 assert x0 is not None
                 img_orig = self.model.q_sample(x0, ts)  # TODO: deterministic forward pass?
                 img = img_orig * mask + (1. - mask) * img
-
+            
             outs = self.p_sample_ddim_with_eps(img, cond, ts, index=index, use_original_steps=ddim_use_original_steps,
                                                quantize_denoised=quantize_denoised, temperature=temperature,
                                                noise_dropout=noise_dropout, score_corrector=score_corrector,
@@ -609,10 +611,10 @@ class DDIMSampler(object):
         elif unconditional_guidance_scale == 0:
             e_t = self.model.apply_model(x, t, unconditional_conditioning)
         else:
-            x_in = torch.cat([x] * 2)
-            t_in = torch.cat([t] * 2)
-            c_in = torch.cat([unconditional_conditioning, c])
-            e_t_uncond, e_t = self.model.apply_model(x_in, t_in, c_in).chunk(2)
+            x_in = x
+            t_in = t
+            e_t_uncond = self.model.apply_model(x_in, t_in, unconditional_conditioning)
+            e_t = self.model.apply_model(x_in, t_in, c)
             e_t = e_t_uncond + unconditional_guidance_scale * (e_t - e_t_uncond)
 
         if score_corrector is not None:

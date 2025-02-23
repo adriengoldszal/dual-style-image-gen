@@ -975,6 +975,8 @@ class LatentDiffusion(DDPM):
             x_recon = fold(o) / normalization
 
         else:
+            #print(f'No split input params ({hasattr(self, "split_input_params")}), directly applying model')
+            #print(f'Conditioning {cond}')
             x_recon = self.model(x_noisy, t, **cond)
 
         if isinstance(x_recon, tuple) and not return_ids:
