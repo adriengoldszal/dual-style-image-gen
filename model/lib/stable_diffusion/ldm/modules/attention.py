@@ -187,8 +187,8 @@ class CrossAttention(nn.Module):
             # Process both contexts
             k1 = self.to_k(context1)
             v1 = self.to_v(context1)
-            k2 = self.to_k(context2)
-            v2 = self.to_v(context2)
+            #k2 = self.to_k(context2)
+            #v2 = self.to_v(context2)
             
             b, n, _ = x.shape
             height = int(math.sqrt(n))
@@ -202,33 +202,34 @@ class CrossAttention(nn.Module):
             print(f'Number of heads: {h}')
 
             q, k1, v1 = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h=h), (q, k1, v1))
-            _, k2, v2 = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h=h), (q, k2, v2))
+            #_, k2, v2 = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h=h), (q, k2, v2))
             
             print(f'After rearrange - q shape: {q.shape}')
             print(f'After rearrange - k1 shape: {k1.shape}')
 
             sim1 = einsum('b i d, b j d -> b i j', q, k1) * self.scale
-            sim2 = einsum('b i d, b j d -> b i j', q, k2) * self.scale
+            #sim2 = einsum('b i d, b j d -> b i j', q, k2) * self.scale
             
             # Modify attention scores before softmax
-            sim1 = sim1 * (1 - y_weights)  # Top patches attend more to first prompt
-            sim2 = sim2 * y_weights       # Bottom patches attend more to second prompt
+            #sim1 = sim1 * (1 - y_weights)  # Top patches attend more to first prompt
+            #sim2 = sim2 * y_weights       # Bottom patches attend more to second prompt
 
             if exists(mask):
                 mask = rearrange(mask, 'b ... -> b (...)')
                 max_neg_value = -torch.finfo(sim1.dtype).max
                 mask = repeat(mask, 'b j -> (b h) () j', h=h)
                 sim1.masked_fill_(~mask, max_neg_value)
-                sim2.masked_fill_(~mask, max_neg_value)
+                #sim2.masked_fill_(~mask, max_neg_value)
 
             # attention, what we cannot get enough of
             attn1 = sim1.softmax(dim=-1)
-            attn2 = sim2.softmax(dim=-1)
+            #attn2 = sim2.softmax(dim=-1)
 
             out1 = einsum('b i j, b j d -> b i d', attn1, v1)
-            out2 = einsum('b i j, b j d -> b i d', attn2, v2)
+            #out2 = einsum('b i j, b j d -> b i d', attn2, v2)
 
-            out = out1 + out2
+            out = out1
+            #out = out1 + out2
             out = rearrange(out, '(b h) n d -> b n (h d)', h=h)
             
         else :
