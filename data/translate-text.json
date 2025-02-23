@@ -1,7 +1,10 @@
 [
     {
         "encode_text": "A black bear walking is walking in the grass",
-        "decode_text": "A black bear walking in grass, top half van gogh style, bottom half blocky minecraft pixels",
+        "decode_text": {
+            "top_prompt": "A black bear walking in grass, van gogh style",
+            "bottom_prompt": "A black bear walking in grass, blocky minecraft pixels"
+        },
         "img_path": "./data/prompt2prompt/bear.png"
     }
 ]

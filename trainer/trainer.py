@@ -451,6 +451,11 @@ class Trainer:
                 
                 # Prediction step : getting the new image
                 print(f'At step {step} in trainer evaluation loop')
+                print('Keys in inputs:')
+                for key in inputs:
+                    print(f'- {key}: {type(inputs[key])}')
+                    if hasattr(inputs[key], 'shape'):
+                        print(f'  Shape: {inputs[key].shape}')
                 prediction_outputs = self.prediction_step(inputs)
 
             (original_img, img, intermediates) , weighted_loss, losses = prediction_outputs

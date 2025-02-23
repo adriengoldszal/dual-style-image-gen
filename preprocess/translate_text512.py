@@ -58,8 +58,11 @@ class DevDataset(Dataset):
         data["encode_text"] = data['meta']['encode_text']
         data["model_kwargs"] = data["model_kwargs"] + ["encode_text", ]
 
-        # Add decode text.
-        data["decode_text"] = data['meta']['decode_text']
+        # Add decode text, now with two prompts
+        data["decode_text"] = {
+            "top_prompt": data['meta']['decode_text']['top_prompt'],
+            "bottom_prompt": data['meta']['decode_text']['bottom_prompt']
+        }
         data["model_kwargs"] = data["model_kwargs"] + ["decode_text", ]
 
         # Add original image.

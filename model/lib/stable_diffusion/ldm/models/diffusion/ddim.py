@@ -613,6 +613,8 @@ class DDIMSampler(object):
         else:
             x_in = x
             t_in = t
+            print(f'In ddim p_sample_ddim_with_eps')
+            print(f'c {c}')
             e_t_uncond = self.model.apply_model(x_in, t_in, unconditional_conditioning)
             e_t = self.model.apply_model(x_in, t_in, c)
             e_t = e_t_uncond + unconditional_guidance_scale * (e_t - e_t_uncond)

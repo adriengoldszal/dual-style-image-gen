@@ -26,12 +26,34 @@ def prepare_stable_diffusion_text(source_model_type):
 
 
 def get_condition(model, text, bs):
-    assert isinstance(text, list)
-    assert isinstance(text[0], str)
-    uc = model.get_learned_conditioning(bs * [""])
-    print("model.cond_stage_key: ", model.cond_stage_key)
-    c = model.get_learned_conditioning(text)
-    print("c.shape: ", c.shape)
+    
+    if isinstance(text, dict):
+        assert 'top_prompt' in text and 'bottom_prompt' in text, "text dictionary must contain 'top_prompt' and 'bottom_prompt'"
+        print(f'Getting decode_text embedding')
+        print(f'c {text}')
+        # Single unconditional embedding (empty string)
+        uc = model.get_learned_conditioning(bs * [""])
+        
+        # Get conditional embeddings for top and bottom prompts
+        c_top = model.get_learned_conditioning(text["top_prompt"])
+        c_bottom = model.get_learned_conditioning(text["bottom_prompt"])
+        c = {"top_prompt": c_top, "bottom_prompt": c_bottom}
+        
+        print("model.cond_stage_key: ", model.cond_stage_key)
+        print("c_top.shape: ", c_top.shape)
+        print("c_bottom.shape: ", c_bottom.shape)
+    
+    # Handle string/list case (for encode_text)
+    else:
+        print(f'Getting encode_text embedding')
+        
+        assert isinstance(text, list)
+        assert isinstance(text[0], str)
+        uc = model.get_learned_conditioning(bs * [""])
+        print("model.cond_stage_key: ", model.cond_stage_key)
+        c = model.get_learned_conditioning(text)
+        print("c.shape: ", c.shape)
+        
     print('-' * 50)
     return c, uc
 

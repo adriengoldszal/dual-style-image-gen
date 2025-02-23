@@ -29,6 +29,8 @@ class TextUnsupervisedTranslation(nn.Module):
 
         z_ensemble = self.gan_wrapper.encode(image=original_image, encode_text=encode_text)
         
+        print(f'In the forward method of text_unsupervised_translation')
+        print(f'Decode text {decode_text}')
         # Calls the forward method of stable_diffusion_stochastic_text_wrapper
         img, intermediates = self.gan_wrapper(z_ensemble=z_ensemble,
                                original_img=original_image,

@@ -882,8 +882,11 @@ class LatentDiffusion(DDPM):
     def apply_model(self, x_noisy, t, cond, return_ids=False):
 
         if isinstance(cond, dict):
-            # hybrid case, cond is exptected to be a dict
-            pass
+            
+            if 'top_prompt' in cond and 'bottom_prompt' in cond:
+                # Structure for crossattention
+                key = 'c_concat' if self.model.conditioning_key == 'concat' else 'c_crossattn'
+                cond = {key: [cond['top_prompt'], cond['bottom_prompt']]}
         else:
             if not isinstance(cond, list):
                 cond = [cond]
@@ -976,7 +979,6 @@ class LatentDiffusion(DDPM):
 
         else:
             #print(f'No split input params ({hasattr(self, "split_input_params")}), directly applying model')
-            #print(f'Conditioning {cond}')
             x_recon = self.model(x_noisy, t, **cond)
 
         if isinstance(x_recon, tuple) and not return_ids:
