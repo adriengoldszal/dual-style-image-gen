@@ -168,28 +168,91 @@ class CrossAttention(nn.Module):
         )
 
     def forward(self, x, context=None, mask=None):
+        print(f'In crossattention')
+        print(f'Context type {type(context)}')
+        print(f'Context shape {context.shape if isinstance(context, torch.Tensor) else "not a tensor"}')
+        print(f'X shape {x.shape}')
+        print(context)
+        
         h = self.heads
 
         q = self.to_q(x)
-        context = default(context, x)
-        k = self.to_k(context)
-        v = self.to_v(context)
 
-        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h=h), (q, k, v))
+        if isinstance(context, list) and len(context) == 2:
+            
+            context1, context2 = context
+            print(f'shapes : context 1 {context1.shape} and context 2 {context2.shape}')
+            print()
+            
+            # Process both contexts
+            k1 = self.to_k(context1)
+            v1 = self.to_v(context1)
+            k2 = self.to_k(context2)
+            v2 = self.to_v(context2)
+            
+            b, n, _ = x.shape
+            height = int(math.sqrt(n))
+            y_coords = torch.linspace(0, 1, height, device=x.device)
+            y_weights = y_coords.view(1, height, 1).repeat(b, 1, height).view(b, n, 1)
+            y_weights = repeat(y_weights, 'b n 1 -> (b h) n 1', h=h)
+            
+            # Interpolate k and v
+            print(f'Before rearrange - q shape: {q.shape}')
+            print(f'Before rearrange - k1 shape: {k1.shape}')
+            print(f'Number of heads: {h}')
 
-        sim = einsum('b i d, b j d -> b i j', q, k) * self.scale
+            q, k1, v1 = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h=h), (q, k1, v1))
+            _, k2, v2 = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h=h), (q, k2, v2))
+            
+            print(f'After rearrange - q shape: {q.shape}')
+            print(f'After rearrange - k1 shape: {k1.shape}')
 
-        if exists(mask):
-            mask = rearrange(mask, 'b ... -> b (...)')
-            max_neg_value = -torch.finfo(sim.dtype).max
-            mask = repeat(mask, 'b j -> (b h) () j', h=h)
-            sim.masked_fill_(~mask, max_neg_value)
+            sim1 = einsum('b i d, b j d -> b i j', q, k1) * self.scale
+            sim2 = einsum('b i d, b j d -> b i j', q, k2) * self.scale
+            
+            # Modify attention scores before softmax
+            sim1 = sim1 * (1 - y_weights)  # Top patches attend more to first prompt
+            sim2 = sim2 * y_weights       # Bottom patches attend more to second prompt
 
-        # attention, what we cannot get enough of
-        attn = sim.softmax(dim=-1)
+            if exists(mask):
+                mask = rearrange(mask, 'b ... -> b (...)')
+                max_neg_value = -torch.finfo(sim1.dtype).max
+                mask = repeat(mask, 'b j -> (b h) () j', h=h)
+                sim1.masked_fill_(~mask, max_neg_value)
+                sim2.masked_fill_(~mask, max_neg_value)
 
-        out = einsum('b i j, b j d -> b i d', attn, v)
-        out = rearrange(out, '(b h) n d -> b n (h d)', h=h)
+            # attention, what we cannot get enough of
+            attn1 = sim1.softmax(dim=-1)
+            attn2 = sim2.softmax(dim=-1)
+
+            out1 = einsum('b i j, b j d -> b i d', attn1, v1)
+            out2 = einsum('b i j, b j d -> b i d', attn2, v2)
+
+            out = out1 + out2
+            out = rearrange(out, '(b h) n d -> b n (h d)', h=h)
+            
+        else :
+        
+            context = default(context, x)
+            k = self.to_k(context)
+            v = self.to_v(context)
+
+            q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h=h), (q, k, v))
+
+            sim = einsum('b i d, b j d -> b i j', q, k) * self.scale
+
+            if exists(mask):
+                mask = rearrange(mask, 'b ... -> b (...)')
+                max_neg_value = -torch.finfo(sim.dtype).max
+                mask = repeat(mask, 'b j -> (b h) () j', h=h)
+                sim.masked_fill_(~mask, max_neg_value)
+
+            # attention, what we cannot get enough of
+            attn = sim.softmax(dim=-1)
+
+            out = einsum('b i j, b j d -> b i d', attn, v)
+            out = rearrange(out, '(b h) n d -> b n (h d)', h=h)
+            
         return self.to_out(out)
 
 

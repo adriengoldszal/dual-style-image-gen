@@ -1394,7 +1394,14 @@ class DiffusionWrapper(pl.LightningModule):
             xc = torch.cat([x] + c_concat, dim=1)
             out = self.diffusion_model(xc, t)
         elif self.conditioning_key == 'crossattn':
-            cc = torch.cat(c_crossattn, 1)
+            print(f'Before conditioning concat {c_crossattn}')
+            #one tensor during encoding, we extract it from the list
+            if len(c_crossattn) == 1:
+                cc = c_crossattn[0]
+            else:
+                # during decoding with multiple conditions, we pass the list directly
+                cc = c_crossattn
+            print(f'Processing {"single tensor" if len(c_crossattn) == 1 else "multiple tensors"} in crossattention')
             out = self.diffusion_model(x, t, context=cc)
         elif self.conditioning_key == 'hybrid':
             xc = torch.cat([x] + c_concat, dim=1)
