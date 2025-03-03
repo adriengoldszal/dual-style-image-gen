@@ -58,6 +58,14 @@ class DevDataset(Dataset):
         data["encode_text"] = data['meta']['encode_text']
         data["model_kwargs"] = data["model_kwargs"] + ["encode_text", ]
 
+        # Add decode text right.
+        data["decode_text_right"] = data['meta']['decode_text_right']
+        data["model_kwargs"] = data["model_kwargs"] + ["decode_text_right", ]
+        
+        # Add decode text left.
+        data["decode_text_left"] = data['meta']['decode_text_left']
+        data["model_kwargs"] = data["model_kwargs"] + ["decode_text_left", ]
+        
         # Add decode text.
         data["decode_text"] = data['meta']['decode_text']
         data["model_kwargs"] = data["model_kwargs"] + ["decode_text", ]

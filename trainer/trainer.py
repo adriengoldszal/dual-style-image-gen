@@ -369,6 +369,7 @@ class Trainer:
             A dictionary containing the metrics computed from the predictions. The
             dictionary also contains the epoch number which comes from the training state.
         """
+    
         eval_dataloader = self.get_eval_dataloader(eval_dataset)
         start_time = time.time()
 
@@ -414,6 +415,7 @@ class Trainer:
         self._prepare_inputs(inputs)
         
         logger.info('\n ***Doing a prediction step***')
+        print(f'inputs keys {inputs.keys()}')
         with torch.no_grad():
             # Calls the forward method of text_unsupervised_translation
             # images is the tuple (input_img, generated_img)
@@ -451,7 +453,9 @@ class Trainer:
                 
                 # Prediction step : getting the new image
                 print(f'At step {step} in trainer evaluation loop')
+                print(f'inputs : {inputs.keys()}')
                 prediction_outputs = self.prediction_step(inputs)
+                print('End prediction step')
 
             (original_img, img, intermediates) , weighted_loss, losses = prediction_outputs
             original_img = original_img.cpu()
@@ -463,6 +467,8 @@ class Trainer:
                 }
             weighted_loss = weighted_loss.cpu()
             losses = {k: v.cpu() for k, v in losses.items()}
+            print(f'losses : {losses}')
+            print(f'weighted_loss : {weighted_loss}')
 
             # Metrics!
             if self.is_world_process_zero():

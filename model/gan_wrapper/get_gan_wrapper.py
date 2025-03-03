@@ -13,6 +13,7 @@ def get_gan_wrapper(args, target=False):
                     kwargs[kw] = arg
 
     if args.gan_type == "SDStochasticText":
+        print("args.gan_type == 'SDStochasticText'")
         from .stable_diffusion_stochastic_text_wrapper import SDStochasticTextWrapper
         return SDStochasticTextWrapper(**kwargs)
     else:

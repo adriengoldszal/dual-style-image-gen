@@ -34,14 +34,15 @@ def get_dataset_splits(args):
         name2dataset_splits[name] = task_dataset_splits
         
         for name, splits in name2dataset_splits.items():
-            print(f"Dataset: {name}")
+            print(f"Dataset main: {name}")
             for split_name, split_data in splits.items():
                 print(f"  Split: {split_name}, Size: {len(split_data)}")
                 for i in range(len(split_data)):
                     example = split_data[i]
                     print(f"\nExample {i}:")
                     print(f"Encode text: {example['encode_text']}")
-                    print(f"Decode text: {example['decode_text']}")
+                    print(f"Decode text right: {example['decode_text_right']}")
+                    print(f"Decode text left: {example['decode_text_left']}")
                     if 'original_image' in example:
                         img = example['original_image']
                         if torch.is_tensor(img):
@@ -73,6 +74,7 @@ def main():
     args.output_dir = training_args.output_dir
     # Build dataset splits.
     dataset_splits = get_dataset_splits(args)
+    print(f'dataset_splits : {dataset_splits}')
     # Initialize evaluator.
     evaluator = get_evaluator(args.evaluation.evaluator_program)(args)
     # Initialize visualizer.
@@ -97,6 +99,7 @@ def main():
     metrics = trainer.evaluate(
         metric_key_prefix="eval",
     )
+    logger.info("*** End Evaluate ***")
     metrics["eval_samples"] = len(dataset_splits['dev'])
 
     trainer.log_metrics("eval", metrics)

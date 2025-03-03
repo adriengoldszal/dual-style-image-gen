@@ -25,6 +25,7 @@ class DDIMSampler(object):
     def make_schedule(self, ddim_num_steps, ddim_discretize="uniform", ddim_eta=0., verbose=True):
         self.ddim_timesteps = make_ddim_timesteps(ddim_discr_method=ddim_discretize, num_ddim_timesteps=ddim_num_steps,
                                                   num_ddpm_timesteps=self.ddpm_num_timesteps,verbose=verbose)
+        print(f'ddim_timesteps : {self.ddim_timesteps}')
         alphas_cumprod = self.model.alphas_cumprod
         assert alphas_cumprod.shape[0] == self.ddpm_num_timesteps, 'alphas have to be defined for each timestep'
         to_torch = lambda x: x.clone().detach().to(torch.float32).to(self.model.device)
@@ -172,7 +173,8 @@ class DDIMSampler(object):
                         eps_list,
                         batch_size,
                         shape,
-                        conditioning=None,
+                        conditioning_right=None,
+                        conditioning_left=None,
                         callback=None,
                         normals_sequence=None,
                         img_callback=None,
@@ -193,14 +195,22 @@ class DDIMSampler(object):
                         # this has to come in the same format as the conditioning, # e.g. as encoded tokens, ...
                         **kwargs
                         ):
-        if conditioning is not None:
-            if isinstance(conditioning, dict):
-                cbs = conditioning[list(conditioning.keys())[0]].shape[0]
+        if conditioning_right is not None:
+            if isinstance(conditioning_right, dict):
+                cbs = conditioning_right[list(conditioning_right.keys())[0]].shape[0]
                 if cbs != batch_size:
                     print(f"Warning: Got {cbs} conditionings but batch-size is {batch_size}")
             else:
-                if conditioning.shape[0] != batch_size:
-                    print(f"Warning: Got {conditioning.shape[0]} conditionings but batch-size is {batch_size}")
+                if conditioning_right.shape[0] != batch_size:
+                    print(f"Warning: Got {conditioning_right.shape[0]} conditionings but batch-size is {batch_size}")
+        if conditioning_left is not None:
+            if isinstance(conditioning_left, dict):
+                cbs = conditioning_left[list(conditioning_left.keys())[0]].shape[0]
+                if cbs != batch_size:
+                    print(f"Warning: Got {cbs} conditionings but batch-size is {batch_size}")
+            else:
+                if conditioning_left.shape[0] != batch_size:
+                    print(f"Warning: Got {conditioning_left.shape[0]} conditionings but batch-size is {batch_size}")
 
         self.make_schedule(ddim_num_steps=S, ddim_eta=eta, verbose=verbose)
         # sampling
@@ -208,7 +218,7 @@ class DDIMSampler(object):
         size = (batch_size, C, H, W)
         print(f'Data shape for DDIM sampling is {size}, eta {eta}')
 
-        samples, intermediates = self.ddim_sampling_with_eps(conditioning, size,
+        samples, intermediates = self.ddim_sampling_with_eps(conditioning_right, conditioning_left, size,
                                                              eps_list,
                                                              callback=callback,
                                                              img_callback=img_callback,
@@ -392,7 +402,7 @@ class DDIMSampler(object):
 
         return img, intermediates
 
-    def ddim_sampling_with_eps(self, cond, shape, eps_list,
+    def ddim_sampling_with_eps(self, cond_right, cond_left, shape, eps_list,
                                x_T=None, ddim_use_original_steps=False,
                                callback=None, timesteps=None, skip_steps=0, quantize_denoised=False,
                                mask=None, x0=None, img_callback=None, log_every_t=100,
@@ -418,8 +428,9 @@ class DDIMSampler(object):
         print(f"Running DDIM Sampling with {total_steps} timesteps and {refine_steps} refinement steps")
 
         refine_time_range = time_range[-refine_steps:]
+        print(f'refine_time_range : {refine_time_range}')
         iterator = tqdm(refine_time_range, desc='DDIM Sampler', total=refine_steps, disable=True)
-
+        print(f'unconditional_guidance_scale : {unconditional_guidance_scale}')
         for i, step in enumerate(iterator):
             index = refine_steps - i - 1
             ts = torch.full((b,), step, device=device, dtype=torch.long)
@@ -429,7 +440,7 @@ class DDIMSampler(object):
                 img_orig = self.model.q_sample(x0, ts)  # TODO: deterministic forward pass?
                 img = img_orig * mask + (1. - mask) * img
 
-            outs = self.p_sample_ddim_with_eps(img, cond, ts, index=index, use_original_steps=ddim_use_original_steps,
+            outs = self.p_sample_ddim_with_eps(img, cond_right, cond_left, ts, index=index, use_original_steps=ddim_use_original_steps,
                                                quantize_denoised=quantize_denoised, temperature=temperature,
                                                noise_dropout=noise_dropout, score_corrector=score_corrector,
                                                corrector_kwargs=corrector_kwargs,
@@ -599,25 +610,59 @@ class DDIMSampler(object):
         xt_next = a_prev.sqrt() * x0 + dir_xt + noise
         return xt_next
 
-    def p_sample_ddim_with_eps(self, x, c, t, index, repeat_noise=False, use_original_steps=False, quantize_denoised=False,
+    def p_sample_ddim_with_eps(self, x, c_right, c_left, t, index, fusion_mode='gaussian', fusion_param=None, repeat_noise=False, use_original_steps=False, quantize_denoised=False,
                                temperature=1., noise_dropout=0., score_corrector=None, corrector_kwargs=None,
                                unconditional_guidance_scale=1., unconditional_conditioning=None, eps=None):
         b, *_, device = *x.shape, x.device
 
+        # if unconditional_conditioning is None or unconditional_guidance_scale == 1.:
+        #     print('guidance')
+        #     e_t = self.model.apply_model(x, t, c)
+        # elif unconditional_guidance_scale == 0:
+        #     print('no guidance')
+        #     e_t = self.model.apply_model(x, t, unconditional_conditioning)
+        # else:
+        #     print('merge guidance')
+        #     x_in = torch.cat([x] * 2)
+        #     t_in = torch.cat([t] * 2)
+        #     c_in = torch.cat([unconditional_conditioning, c])
+        #     e_t_uncond, e_t = self.model.apply_model(x_in, t_in, c_in).chunk(2)
+        #     e_t = e_t_uncond + unconditional_guidance_scale * (e_t - e_t_uncond)
+               # --- 1. Calcul de e_t_left et e_t_right en fonction du conditionnement ---
         if unconditional_conditioning is None or unconditional_guidance_scale == 1.:
-            e_t = self.model.apply_model(x, t, c)
+            print('full guidance')
+            e_t_left = self.model.apply_model(x, t, c_left)
+            e_t_right = self.model.apply_model(x, t, c_right)
         elif unconditional_guidance_scale == 0:
-            e_t = self.model.apply_model(x, t, unconditional_conditioning)
+            print('no guidance')
+            e_t_left = self.model.apply_model(x, t, unconditional_conditioning)
+            e_t_right = self.model.apply_model(x, t, unconditional_conditioning)
         else:
-            x_in = torch.cat([x] * 2)
-            t_in = torch.cat([t] * 2)
-            c_in = torch.cat([unconditional_conditioning, c])
-            e_t_uncond, e_t = self.model.apply_model(x_in, t_in, c_in).chunk(2)
-            e_t = e_t_uncond + unconditional_guidance_scale * (e_t - e_t_uncond)
+            # print('cfg guidance')
+            # Classifier-free guidance : USED
+            x_in = torch.cat([x] * 4)
+            t_in = torch.cat([t] * 4)
+            c_in = torch.cat([unconditional_conditioning, unconditional_conditioning, c_left, c_right])
+            e_t_uncond_left, e_t_uncond_right, e_t_left, e_t_right = self.model.apply_model(x_in, t_in, c_in).chunk(4)
+            e_t_left = e_t_uncond_left + unconditional_guidance_scale * (e_t_left - e_t_uncond_left)
+            e_t_right = e_t_uncond_right + unconditional_guidance_scale * (e_t_right - e_t_uncond_right)
+        # x shape (b, c, H, W)
+        width = x.shape[-1]
+        if fusion_mode == "linear":
+            mask = torch.linspace(1, 0, steps=width, device=device).view(1, 1, 1, width)
+        elif fusion_mode == "gaussian":
+            sigma = fusion_param if fusion_param is not None else 0.2
+            x_lin = torch.linspace(0, 1, steps=width, device=device)
+            mask = torch.exp(-0.5 * ((x_lin - 0.0) / sigma) ** 2).view(1, 1, 1, width)
+        else:
+            raise ValueError("fusion_mode must be either 'linear' or 'gaussian'")
 
+        e_t = mask * e_t_left + (1 - mask) * e_t_right
+        
         if score_corrector is not None:
+            print('score_corrector is not None')
             assert self.model.parameterization == "eps"
-            e_t = score_corrector.modify_score(self.model, e_t, x, t, c, **corrector_kwargs)
+            e_t = score_corrector.modify_score(self.model, e_t, x, t, c_left, **corrector_kwargs)
 
         alphas = self.model.alphas_cumprod if use_original_steps else self.ddim_alphas
         alphas_prev = self.model.alphas_cumprod_prev if use_original_steps else self.ddim_alphas_prev
@@ -632,12 +677,15 @@ class DDIMSampler(object):
         # current prediction for x_0
         pred_x0 = (x - sqrt_one_minus_at * e_t) / a_t.sqrt()
         if quantize_denoised:
+            print('quantize_denoised = True')
             pred_x0, _, *_ = self.model.first_stage_model.quantize(pred_x0)
         # direction pointing to x_t
         dir_xt = (1. - a_prev - sigma_t**2).sqrt() * e_t
         if eps is None:
+            print('eps is NOT given')
             noise = sigma_t * noise_like(x.shape, device, repeat_noise) * temperature
         else:
+            #USED
             noise = sigma_t * eps * temperature
         if noise_dropout > 0.:
             noise = torch.nn.functional.dropout(noise, p=noise_dropout)

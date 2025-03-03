@@ -21,7 +21,7 @@ class TextUnsupervisedTranslation(nn.Module):
             transforms.ToTensor()
         ])
 
-    def forward(self, sample_id, original_image, encode_text, decode_text):
+    def forward(self, sample_id, original_image, encode_text, decode_text_right, decode_text_left, decode_text):
         # Eval mode for gan_wrapper.
         self.gan_wrapper.eval()
 
@@ -33,7 +33,8 @@ class TextUnsupervisedTranslation(nn.Module):
         img, intermediates = self.gan_wrapper(z_ensemble=z_ensemble,
                                original_img=original_image,
                                encode_text=encode_text,
-                               decode_text=decode_text)
+                               decode_text_right=decode_text_right,
+                               decode_text_left=decode_text_left)
 
         # Placeholders
         losses = dict()

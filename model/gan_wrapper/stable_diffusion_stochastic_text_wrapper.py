@@ -36,14 +36,16 @@ def get_condition(model, text, bs):
     return c, uc
 
 
-def convsample_ddim_conditional(model, steps, shape, x_T, skip_steps, eta, eps_list, scale, text):
+def convsample_ddim_conditional(model, steps, shape, x_T, skip_steps, eta, eps_list, scale, text_right, text_left):
     ddim = DDIMSampler(model)
     bs = shape[0]
     shape = shape[1:]
-    c, uc = get_condition(model, text, bs)
+    c_right, uc_right = get_condition(model, text_right, bs)
+    c_left, uc_left = get_condition(model, text_left, bs)
     samples, intermediates = ddim.sample_with_eps(steps,
                                                   eps_list,
-                                                  conditioning=c,
+                                                  conditioning_right=c_right,
+                                                  conditioning_left=c_left,
                                                   batch_size=bs,
                                                   shape=shape,
                                                   eta=eta,
@@ -51,14 +53,14 @@ def convsample_ddim_conditional(model, steps, shape, x_T, skip_steps, eta, eps_l
                                                   x_T=x_T,
                                                   skip_steps=skip_steps,
                                                   unconditional_guidance_scale=scale,
-                                                  unconditional_conditioning=uc,
+                                                  unconditional_conditioning=uc_right,
                                                   log_every_t=10,
                                                   )
     return samples, intermediates
 
 
 def make_convolutional_sample_with_eps_conditional(model, custom_steps, eta, x_T, skip_steps, eps_list,
-                                                   scale, text):
+                                                   scale, text_right, text_left):
     with model.ema_scope("Plotting"):
         sample, intermediates = convsample_ddim_conditional(model,
                                                             steps=custom_steps,
@@ -68,7 +70,8 @@ def make_convolutional_sample_with_eps_conditional(model, custom_steps, eta, x_T
                                                             eta=eta,
                                                             eps_list=eps_list,
                                                             scale=scale,
-                                                            text=text)
+                                                            text_right=text_right,
+                                                            text_left=text_left)
     
     
     print(f'In the SDS Wrapper:')
@@ -131,7 +134,7 @@ class SDStochasticTextWrapper(torch.nn.Module):
                  encoder_unconditional_guidance_scales=None, decoder_unconditional_guidance_scales=None,
                  n_trials=None):
         super(SDStochasticTextWrapper, self).__init__()
-
+        print('==INITIALISATION==')
         self.encoder_unconditional_guidance_scales = encoder_unconditional_guidance_scales
         self.decoder_unconditional_guidance_scales = decoder_unconditional_guidance_scales
         self.n_trials = n_trials
@@ -167,20 +170,29 @@ class SDStochasticTextWrapper(torch.nn.Module):
         # Directional CLIP score.
         self.directional_clip = DirectionalCLIP()
 
-    def generate(self, z_ensemble, decode_text):
+    def generate(self, z_ensemble, decode_text_right, decode_text_left):
+        print("==GENERATE==")
         precision_scope = autocast if self.precision == "autocast" else nullcontext
         with precision_scope("cuda"):
             img_ensemble = []
             intermediates_ensemble = []
             for i, z in enumerate(z_ensemble):
+                print(f'z.shape : {z.shape}')
                 skip_steps = self.skip_steps[i % len(self.skip_steps)]
                 bsz = z.shape[0]
+                print(f'white_box_steps : {self.white_box_steps}')
+                print(f'skip_steps : {skip_steps}')
                 if self.white_box_steps != -1:
                     eps_list = z.view(bsz, (self.white_box_steps - skip_steps), self.generator.channels, self.generator.image_size, self.generator.image_size)
                 else:
                     eps_list = z.view(bsz, 1, self.generator.channels, self.generator.image_size, self.generator.image_size)
+                
                 x_T = eps_list[:, 0]
                 eps_list = eps_list[:, 1:]
+                print(f'x_T.shape : {x_T.shape}')
+                print(f'eps_list.shape {eps_list.shape}')
+                print(f'custom_steps : {self.custom_steps}')
+                print(f'eta : {self.eta}')
                 # Uses the same epsilons for decoding !
 
                 for decoder_unconditional_guidance_scale in self.decoder_unconditional_guidance_scales:
@@ -191,13 +203,16 @@ class SDStochasticTextWrapper(torch.nn.Module):
                                                                          skip_steps=skip_steps,
                                                                          eps_list=eps_list,
                                                                          scale=decoder_unconditional_guidance_scale,
-                                                                         text=decode_text)
+                                                                         text_right=decode_text_right,
+                                                                         text_left=decode_text_left)
                     img_ensemble.append(img)
                     intermediates_ensemble.append(decoded_intermediates)
-
+        print(f'img end generate : {img_ensemble[0].shape}')
+        print(f'intermediates : {intermediates_ensemble[0].keys()}')
         return img_ensemble, intermediates_ensemble
 
     def encode(self, image, encode_text):
+        print("==ENCODE==")
         # Eval mode for the generator.
         self.generator.eval()
 
@@ -234,24 +249,25 @@ class SDStochasticTextWrapper(torch.nn.Module):
                                                                     text=encode_text)
                             z = torch.stack(z_list, dim=1).view(bsz, -1)
                             z_ensemble.append(z)
-
+        print(f'z_ensemble.shape {z_ensemble[0].shape}')
         return z_ensemble
 
-    def forward(self, z_ensemble, original_img, encode_text, decode_text):
+    def forward(self, z_ensemble, original_img, encode_text, decode_text_right, decode_text_left):
         # Eval mode for the generator.
         self.generator.eval()
 
-        img_ensemble, intermediates_ensemble = self.generate(z_ensemble, decode_text)
+        img_ensemble, intermediates_ensemble = self.generate(z_ensemble, decode_text_right, decode_text_left)
         assert len(img_ensemble) == len(self.decoder_unconditional_guidance_scales) * len(self.encoder_unconditional_guidance_scales) * len(self.skip_steps) * self.n_trials
-
+     
         # Post process.
         img = self.post_process(img_ensemble[0])  # Just take the first (and only) image
-    
+       
         processed_intermediates = {
             'x_inter': [self.post_process(x) for x in intermediates_ensemble[0]['x_inter']],
             'pred_x0': [self.post_process(x) for x in intermediates_ensemble[0]['pred_x0']]
         }
-
+        print(f'img.shape {img.shape}')
+        print(f'intermediates keys {processed_intermediates.keys()}')
         return img, processed_intermediates
 
     @property
