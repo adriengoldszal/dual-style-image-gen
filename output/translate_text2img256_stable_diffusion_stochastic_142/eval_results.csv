@@ -1,2 +1,2 @@
 encode_text,decode_text,clip,dclip,psnr,ssim,l2
-A picture of a grey bedroom.,A Van Gogh-style painting of a grey bedroom.,0.2817278802394867,0.04310033097863197,17.47698211669922,0.7128363601569226,118.57182312011719
+A picture of a grey bedroom.,"A Minecraft-inspired rendering of a grey bedroom, featuring distinct pixelated 16x16 textures, blocky 3D cube structures, limited color palette with no gradients, sharp right angles and perfect squares, characteristic voxel-based terrain with visible block edges.",0.35045066475868225,0.17686967551708221,17.105392456054688,0.6482649853914202,123.75447845458984

@@ -1,7 +1,7 @@
 [
     {
         "encode_text": "A picture of a grey bedroom.",
-        "decode_text": "A Van Gogh-style painting of a grey bedroom, with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night.",
+        "decode_text": "A Minecraft-inspired rendering of a grey bedroom, featuring distinct pixelated 16x16 textures, blocky 3D cube structures, limited color palette with no gradients, sharp right angles and perfect squares, characteristic voxel-based terrain with visible block edges.",
         "img_path": "./data/prompt2prompt/image_8.png"
     }
 ]

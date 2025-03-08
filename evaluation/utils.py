@@ -6,6 +6,7 @@ from torchvision import utils
 
 def save_image(image_path, image):
     assert image.dim() == 3 and image.shape[0] == 3
+    print(f'Saving image dim {image.dim} at path {image_path}')
 
     utils.save_image(image, image_path)
 
