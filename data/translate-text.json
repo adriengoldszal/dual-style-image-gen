@@ -1,7 +1,7 @@
 [
     {
-        "encode_text": "A black bear is walking in the grass.",
-        "decode_text": "A minecraft style painting of a black bear walking in the grass.",
-        "img_path": "./data/prompt2prompt/bear.png"
+        "encode_text": "A picture of two hikers in front of a mountain.",
+        "decode_text": "A Van Gogh-style painting of two hikers in front of a mountain, with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night.",
+        "img_path": "./data/prompt2prompt/hikers.png"
     }
 ]

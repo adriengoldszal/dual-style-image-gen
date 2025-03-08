@@ -1,2 +1,2 @@
 encode_text,decode_text,clip,dclip,psnr,ssim,l2
-A black bear is walking in the grass.,A minecraft style painting of a black bear walking in the grass.,0.4012662172317505,0.2162128984928131,16.46198081970215,0.5151576730803967,133.2697296142578
+A picture of two hikers in front of a mountain.,"A Van Gogh-style painting of two hikers in front of a mountain, with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night.",0.33600935339927673,0.14733129739761353,12.276660919189453,0.3336532488761435,215.77320861816406
