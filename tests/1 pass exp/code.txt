@@ -1,0 +1,53 @@
+if isinstance(context, list) and len(context) == 2:
+            context1, context2 = context
+             
+            for _ in range(1):
+                
+                q = self.to_q(x)
+                # Process both contexts
+                k1 = self.to_k(context1)
+                v1 = self.to_v(context1)
+                k2 = self.to_k(context2)
+                v2 = self.to_v(context2)
+                
+                b, n, _ = x.shape
+                width = int(math.sqrt(n))
+                
+                x_coords = torch.linspace(0, 1, width, device=x.device)
+                x_weights = x_coords.repeat(width, 1).reshape(-1)
+                x_weights = x_weights.unsqueeze(0).repeat(b, 1)
+                
+                sharpness = 50.0 
+                x_weights = torch.exp(sharpness * (x_weights - 0.5)) / (torch.exp(sharpness * (x_weights - 0.5)) + 1)
+
+                # Rearrange tensors for attention computation
+                q, k1, v1 = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h=h), (q, k1, v1))
+                k2, v2 = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h=h), (k2, v2))
+                
+                # Expand weights for heads
+                x_weights = repeat(x_weights, 'b n -> (b h) n 1', h=h)
+                #y_weights = repeat(y_weights, 'b n -> (b h) n 1', h=h)
+                
+                sim1 = einsum('b i d, b j d -> b i j', q, k1) * self.scale
+                sim2 = einsum('b i d, b j d -> b i j', q, k2) * self.scale
+                
+                # Apply mask if provided
+                if exists(mask):
+                    mask = rearrange(mask, 'b ... -> b (...)')
+                    max_neg_value = -torch.finfo(sim1.dtype).max
+                    mask = repeat(mask, 'b j -> (b h) () j', h=h)
+                    sim1.masked_fill_(~mask, max_neg_value)
+                    sim2.masked_fill_(~mask, max_neg_value)
+                
+                # Compute attention and output
+                attn1 = sim1.softmax(dim=-1)
+                attn2 = sim2.softmax(dim=-1)
+                
+                out1 = einsum('b i j, b j d -> b i d', attn1, v1)
+                out2 = einsum('b i j, b j d -> b i d', attn2, v2)
+                
+                x_weights = x_weights.reshape(-1, q.shape[1], 1) 
+                print(f'X weights shape {x_weights.shape}, out1 {out1.shape}, out2 {out2.shape}')
+                print(x_weights[0])
+                out = out1 * (1 - x_weights) + out2 * x_weights
+                out = rearrange(out, '(b h) n d -> b n (h d)', h=h, b=b) 
