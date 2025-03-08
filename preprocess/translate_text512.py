@@ -60,10 +60,13 @@ class DevDataset(Dataset):
 
         # Add decode text, now with two prompts
         data["decode_text"] = {
-            "top_prompt": data['meta']['decode_text']['top_prompt'],
-            "bottom_prompt": data['meta']['decode_text']['bottom_prompt']
+            "left_prompt": data['meta']['decode_text']['left_prompt'],
+            "right_prompt": data['meta']['decode_text']['right_prompt']
         }
         data["model_kwargs"] = data["model_kwargs"] + ["decode_text", ]
+        
+        data["decode_text_total"] = data['meta']['decode_text_total']
+        data["model_kwargs"] = data["model_kwargs"] + ["decode_text_total"]
 
         # Add original image.
         data['original_image'] = img

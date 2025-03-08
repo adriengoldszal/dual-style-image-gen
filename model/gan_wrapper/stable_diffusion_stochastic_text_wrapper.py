@@ -28,20 +28,20 @@ def prepare_stable_diffusion_text(source_model_type):
 def get_condition(model, text, bs):
     
     if isinstance(text, dict):
-        assert 'top_prompt' in text and 'bottom_prompt' in text, "text dictionary must contain 'top_prompt' and 'bottom_prompt'"
+        assert 'left_prompt' in text and 'right_prompt' in text, "text dictionary must contain 'right_prompt' and 'left_prompt'"
         print(f'Getting decode_text embedding')
         print(f'c {text}')
         # Single unconditional embedding (empty string)
         uc = model.get_learned_conditioning(bs * [""])
         
         # Get conditional embeddings for top and bottom prompts
-        c_top = model.get_learned_conditioning(text["top_prompt"])
-        c_bottom = model.get_learned_conditioning(text["bottom_prompt"])
-        c = {"top_prompt": c_top, "bottom_prompt": c_bottom}
+        c_right = model.get_learned_conditioning(text["right_prompt"])
+        c_left= model.get_learned_conditioning(text["left_prompt"])
+        c = {"right_prompt": c_right, "left_prompt": c_left}
         
         print("model.cond_stage_key: ", model.cond_stage_key)
-        print("c_top.shape: ", c_top.shape)
-        print("c_bottom.shape: ", c_bottom.shape)
+        print("c_right.shape: ", c_right.shape)
+        print("c_left.shape: ", c_left.shape)
     
     # Handle string/list case (for encode_text)
     else:

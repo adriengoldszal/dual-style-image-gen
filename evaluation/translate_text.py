@@ -43,12 +43,17 @@ class Evaluator(object):
         assert len(data) == len(images)
         n = len(images)
         all_psnr, all_ssim, all_l2 = 0, 0, 0
-        all_clip, all_dclip = 0, 0
+        all_clip, all_dclip, all_clip_right, all_dclip_right, all_clip_left, all_dclip_left = 0, 0, 0, 0, 0, 0
         sample_results = {
             'encode_text': [],
-            'decode_text': [],
+            'decode_text_right': [],
+            'decode_text_left': [],
             'clip': [],
             'dclip': [],
+            'clip_right': [],
+            'dclip_right': [],
+            'clip_left': [],
+            'dclip_left': [],
             'psnr': [],
             'ssim': [],
             'l2': [],
@@ -58,20 +63,37 @@ class Evaluator(object):
             assert img.dim() == original_img.dim() == 3
 
             encode_text = data[idx]['encode_text']
-            decode_text = data[idx]['decode_text']
+            decode_text_right = data[idx]['decode_text']['right_prompt']
+            decode_text_left = data[idx]['decode_text']['left_prompt']
+            decode_text = data[idx]['decode_text_total']
             print('encode_text: {}'.format(encode_text))
+            print('decode_text_right: {}'.format(decode_text_right))
+            print('decode_text_left: {}'.format(decode_text_left))
             print('decode_text: {}'.format(decode_text))
-
-            clip_score, dclip_score = self.directional_clip(img.unsqueeze(0),
+            clip_score, dclip_score, clip_score_right, dclip_score_right, clip_score_left, dclip_score_left = self.directional_clip(img.unsqueeze(0),
                                                             original_img.unsqueeze(0),
                                                             [encode_text],
                                                             [decode_text],
+                                                            [decode_text_right],
+                                                            [decode_text_left],
                                                             )
             clip_score = clip_score.item()
             dclip_score = dclip_score.item()
 
             all_clip += clip_score
             all_dclip += dclip_score
+            
+            clip_score_right = clip_score_right.item()
+            dclip_score_right = dclip_score_right.item()
+
+            all_clip_right += clip_score_right
+            all_dclip_right += dclip_score_right
+            
+            clip_score_left = clip_score_left.item()
+            dclip_score_left = dclip_score_left.item()
+
+            all_clip_left += clip_score_left
+            all_dclip_left += dclip_score_left
 
             img = img.clamp(0, 1)
             original_img = original_img.clamp(0, 1)
@@ -90,15 +112,24 @@ class Evaluator(object):
 
             print('clip_score: {}'.format(clip_score))
             print('dclip_score: {}'.format(dclip_score))
+            print('clip_score_right: {}'.format(clip_score_right))
+            print('dclip_score_right: {}'.format(dclip_score_right))
+            print('clip_score_left: {}'.format(clip_score_left))
+            print('dclip_score_left: {}'.format(dclip_score_left))
             print('psnr: {}'.format(psnr))
             print('ssim: {}'.format(ssim))
             print('l2: {}'.format(l2))
             print('-' * 50)
 
             sample_results['encode_text'].append(encode_text)
-            sample_results['decode_text'].append(decode_text)
+            sample_results['decode_text_right'].append(decode_text_right)
+            sample_results['decode_text_left'].append(decode_text_left)
             sample_results['clip'].append(clip_score)
             sample_results['dclip'].append(dclip_score)
+            sample_results['clip_right'].append(clip_score_right)
+            sample_results['dclip_right'].append(dclip_score_right)
+            sample_results['clip_left'].append(clip_score_left)
+            sample_results['dclip_left'].append(dclip_score_left)
             sample_results['psnr'].append(psnr)
             sample_results['ssim'].append(ssim)
             sample_results['l2'].append(l2)
@@ -113,9 +144,16 @@ class Evaluator(object):
             "l2": all_l2 / n,
             "clip": all_clip / n,
             "d-clip": all_dclip / n,
+            "clip_right": all_clip / n,
+            "d-clip_right": all_dclip / n,
+            "clip_left": all_clip / n,
+            "d-clip_left": all_dclip / n,
         }
 
         # Save all results with pandas.
+        # for key, value in sample_results.items():
+        #     print(f"{key}: {len(value)}")
+
         df = pd.DataFrame(sample_results)
         df.to_csv(os.path.join(self.meta_args.output_dir, '{}_results.csv'.format(split)), index=False)
 

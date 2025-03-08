@@ -883,10 +883,10 @@ class LatentDiffusion(DDPM):
 
         if isinstance(cond, dict):
             
-            if 'top_prompt' in cond and 'bottom_prompt' in cond:
+            if 'right_prompt' in cond and 'left_prompt' in cond:
                 # Structure for crossattention
                 key = 'c_concat' if self.model.conditioning_key == 'concat' else 'c_crossattn'
-                cond = {key: [cond['top_prompt'], cond['bottom_prompt']]}
+                cond = {key: [cond['left_prompt'], cond['right_prompt']]}
         else:
             if not isinstance(cond, list):
                 cond = [cond]

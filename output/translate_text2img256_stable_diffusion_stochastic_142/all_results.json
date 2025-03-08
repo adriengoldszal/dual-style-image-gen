@@ -1,0 +1,17 @@
+{
+    "eval/avr": 19.959483983228115,
+    "eval/runtime": 35.5041,
+    "eval/samples_per_second": 0.028,
+    "eval/steps_per_second": 0.028,
+    "eval/translate/clip": 0.3412429094314575,
+    "eval/translate/clip_left": 0.3412429094314575,
+    "eval/translate/clip_right": 0.3412429094314575,
+    "eval/translate/d-clip": 0.1001138687133789,
+    "eval/translate/d-clip_left": 0.1001138687133789,
+    "eval/translate/d-clip_right": 0.1001138687133789,
+    "eval/translate/l2": 163.16050720214844,
+    "eval/translate/psnr": 14.70431137084961,
+    "eval/translate/ssim": 0.4464669416204707,
+    "eval/weighted_loss": 0.0,
+    "eval_samples": 1
+}

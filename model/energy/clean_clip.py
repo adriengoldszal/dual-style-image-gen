@@ -16,29 +16,51 @@ class DirectionalCLIP(object):
             clip_preprocess.transforms[4:]
         )
 
-    def __call__(self, img, original_img, encode_text, decode_text):
+    def __call__(self, img, original_img, encode_text, decode_text, decode_text_right, decode_text_left):
         assert len(decode_text) == img.shape[0]
         assert len(encode_text) == original_img.shape[0]
-
+        
         with torch.no_grad():
             encode_text_feature = self.model.encode_text(clip.tokenize(encode_text).to('cuda'))
             encode_text_feature /= encode_text_feature.norm(dim=-1, keepdim=True)
+            
             decode_text_feature = self.model.encode_text(clip.tokenize(decode_text).to('cuda'))
             decode_text_feature /= decode_text_feature.norm(dim=-1, keepdim=True)
+            
+            decode_text_right_feature = self.model.encode_text(clip.tokenize(decode_text_right).to('cuda'))
+            decode_text_right_feature /= decode_text_right_feature.norm(dim=-1, keepdim=True)
+            
+            decode_text_left_feature = self.model.encode_text(clip.tokenize(decode_text_left).to('cuda'))
+            decode_text_left_feature /= decode_text_left_feature.norm(dim=-1, keepdim=True)
+            
             img_feature = self.model.encode_image(self.clip_preprocess(img).to('cuda'))
             img_feature /= img_feature.norm(dim=-1, keepdim=True)
+            
             original_img_feature = self.model.encode_image(self.clip_preprocess(original_img).to('cuda'))
             original_img_feature /= original_img_feature.norm(dim=-1, keepdim=True)
 
             img_direction = img_feature - original_img_feature
             img_direction /= img_direction.norm(dim=-1, keepdim=True)
+            
             text_direction = decode_text_feature - encode_text_feature
             text_direction /= text_direction.norm(dim=-1, keepdim=True)
+            
+            text_right_direction = decode_text_right_feature - encode_text_feature
+            text_right_direction /= text_right_direction.norm(dim=-1, keepdim=True)
+            
+            text_left_direction = decode_text_left_feature - encode_text_feature
+            text_left_direction /= text_left_direction.norm(dim=-1, keepdim=True)
 
             clip_score = torch.einsum('bz,bz->b', img_feature, decode_text_feature)
             dclip_score = torch.einsum('bz,bz->b', img_direction, text_direction)
+            
+            clip_score_right = torch.einsum('bz,bz->b', img_feature, decode_text_right_feature)
+            dclip_score_right = torch.einsum('bz,bz->b', img_direction, text_right_direction)
+            
+            clip_score_left = torch.einsum('bz,bz->b', img_feature, decode_text_left_feature)
+            dclip_score_left = torch.einsum('bz,bz->b', img_direction, text_left_direction)
 
-        return clip_score, dclip_score
+        return clip_score, dclip_score, clip_score_right, dclip_score_right, clip_score_left, dclip_score_left
 
 
 class CLIP(object):

@@ -94,7 +94,13 @@ def main():
     # Evaluation after training
     logger.info("*** Evaluate ***")
 
-    trainer.evaluate(metric_key_prefix="eval")
+    metrics = trainer.evaluate(
+        metric_key_prefix="eval",
+    )
+    metrics["eval_samples"] = len(dataset_splits['dev'])
+
+    trainer.log_metrics("eval", metrics)
+    trainer.save_metrics("eval", metrics)
 
 
 if __name__ == "__main__":

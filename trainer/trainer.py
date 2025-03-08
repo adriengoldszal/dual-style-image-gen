@@ -373,12 +373,27 @@ class Trainer:
         start_time = time.time()
 
         eval_loop = self.evaluation_loop
-        num_samples = eval_loop(
+        metrics, num_samples = eval_loop(
             eval_dataloader,
             description="eval",
             metric_key_prefix=metric_key_prefix,
         )
-    
+
+        if self.is_world_process_zero():
+            total_batch_size = self.args.eval_batch_size * self.args.world_size
+            metrics.update(
+                speed_metrics(
+                    metric_key_prefix,
+                    start_time,
+                    num_samples=num_samples,
+                    num_steps=math.ceil(num_samples / total_batch_size),
+                )
+            )
+
+            self.log(metrics)
+
+        return metrics
+
     def prediction_step(
             self,
             inputs: Dict[str, Union[torch.Tensor, Any]],
@@ -455,8 +470,35 @@ class Trainer:
             losses = {k: v.cpu() for k, v in losses.items()}
 
 
-            # Save images.
-            self.visualize(images=(original_img, img),intermediates=intermediates, description=description)
+            if self.is_world_process_zero():
+                if self.compute_metrics and prediction_outputs:
+                    metrics = self.compute_metrics((original_img, img),
+                                                self.model.module,
+                                                weighted_loss,
+                                                losses,
+                                                dataset=eval_dataset,
+                                                split=metric_key_prefix,
+                                                )
+                else:
+                    metrics = {}
+
+                # To be JSON-serializable, we need to remove numpy types or zero-d tensors
+                metrics = denumpify_detensorize(metrics)
+
+                # Prefix all keys with metric_key_prefix + '/'
+                for key in list(metrics.keys()):
+                    if not key.startswith(f"{metric_key_prefix}/"):
+                        metrics[f"{metric_key_prefix}/{key}"] = metrics.pop(key)
+
+                # Weighted loss and losses
+                metrics[f"{metric_key_prefix}/weighted_loss"] = weighted_loss.mean(0).item()
+                for key, value in losses.items():
+                    metrics[f"{metric_key_prefix}/{key}"] = value.mean(0).item()
+
+                # Save images.
+                self.visualize(images=(original_img, img),intermediates=intermediates, description=description)
+            else:
+                metrics = None
 
 
-            return len(eval_dataset)
+            return metrics, len(eval_dataset)

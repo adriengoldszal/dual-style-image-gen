@@ -21,7 +21,7 @@ class TextUnsupervisedTranslation(nn.Module):
             transforms.ToTensor()
         ])
 
-    def forward(self, sample_id, original_image, encode_text, decode_text):
+    def forward(self, sample_id, original_image, encode_text, decode_text, decode_text_total):
         # Eval mode for gan_wrapper.
         self.gan_wrapper.eval()
 
