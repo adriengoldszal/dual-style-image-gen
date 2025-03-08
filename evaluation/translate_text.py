@@ -3,7 +3,7 @@ import torch
 from tqdm import tqdm
 import pandas as pd
 from model.energy.clean_clip import DirectionalCLIP
-from .utils import save_image, calculate_ssim, calculate_psnr
+from .utils import save_image, calculate_ssim, calculate_psnr, calculate_lpips, total_variation
 
 
 class Evaluator(object):
@@ -109,6 +109,11 @@ class Evaluator(object):
                 ((img - original_img) ** 2).sum(2).sum(1).sum(0)
             ).item()
             all_l2 += l2
+            
+            lpips = calculate_lpips(img, original_img)
+            
+            total_variation_original = total_variation(original_img)
+            total_variation_generated = total_variation(img)
 
             print('clip_score: {}'.format(clip_score))
             print('dclip_score: {}'.format(dclip_score))
@@ -119,6 +124,10 @@ class Evaluator(object):
             print('psnr: {}'.format(psnr))
             print('ssim: {}'.format(ssim))
             print('l2: {}'.format(l2))
+            print('lpips: {}'.format(lpips))
+            print('total_variation_original: {}'.format(total_variation_original))
+            print('total_variation_generated: {}'.format(total_variation_generated))
+            print('delta_total_variation: {}'.format(total_variation_generated - total_variation_original))
             print('-' * 50)
 
             sample_results['encode_text'].append(encode_text)

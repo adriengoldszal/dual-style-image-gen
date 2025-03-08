@@ -2,6 +2,10 @@ import numpy as np
 import torch
 import cv2
 from torchvision import utils
+import lpips
+import torch.nn.functional as F
+from torchvision.models import inception_v3
+from scipy.linalg import sqrtm
 
 
 def save_image(image_path, image):
@@ -65,3 +69,57 @@ def calculate_psnr(img1, img2):
     if mse == 0:
         return 100
     return 10 * torch.log10(1 / mse)
+
+
+def calculate_lpips(img1, img2):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    
+    if isinstance(img1, np.ndarray):
+        img1 = torch.from_numpy(img1)
+    if isinstance(img2, np.ndarray):
+        img2 = torch.from_numpy(img2)
+    
+    if img1.ndim == 2:
+        img1 = img1.unsqueeze(0).repeat(3, 1, 1)
+    elif img1.ndim == 3:
+        if img1.shape[0] != 3 and img1.shape[2] == 3:
+            img1 = img1.permute(2, 0, 1)
+    if img2.ndim == 2:
+        img2 = img2.unsqueeze(0).repeat(3, 1, 1)
+    elif img2.ndim == 3:
+        if img2.shape[0] != 3 and img2.shape[2] == 3:
+            img2 = img2.permute(2, 0, 1)
+    
+    img1 = img1.unsqueeze(0).float()
+    img2 = img2.unsqueeze(0).float()
+    
+    def normalize_img(tensor):
+        if tensor.max() > 1:
+            return tensor / 127.5 - 1.0
+        else:
+            return tensor * 2 - 1.0
+    
+    img1 = normalize_img(img1)
+    img2 = normalize_img(img2)
+    
+    loss_fn = lpips.LPIPS(net='vgg').to(device)
+    img1 = img1.to(device)
+    img2 = img2.to(device)
+    
+    with torch.no_grad():
+        dist = loss_fn(img1, img2)
+    
+    return dist.item()
+
+def total_variation(image):
+    image = image.float()
+    
+    diff_h = image[:, :, 1:] - image[:, :, :-1]
+    diff_v = image[:, 1:, :] - image[:, :-1, :]
+    
+    tv_h = torch.sqrt(diff_h ** 2 + 1e-6)  
+    tv_v = torch.sqrt(diff_v ** 2 + 1e-6)
+    
+    tv = torch.sum(tv_h) + torch.sum(tv_v)
+    
+    return tv.item()

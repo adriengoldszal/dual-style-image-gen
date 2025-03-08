@@ -610,7 +610,7 @@ class DDIMSampler(object):
         xt_next = a_prev.sqrt() * x0 + dir_xt + noise
         return xt_next
 
-    def p_sample_ddim_with_eps(self, x, c_right, c_left, t, index, fusion_mode='gaussian', fusion_param=None, repeat_noise=False, use_original_steps=False, quantize_denoised=False,
+    def p_sample_ddim_with_eps(self, x, c_right, c_left, t, index, fusion_mode='gaussian', repeat_noise=False, use_original_steps=False, quantize_denoised=False,
                                temperature=1., noise_dropout=0., score_corrector=None, corrector_kwargs=None,
                                unconditional_guidance_scale=1., unconditional_conditioning=None, eps=None):
         b, *_, device = *x.shape, x.device
@@ -651,9 +651,13 @@ class DDIMSampler(object):
         if fusion_mode == "linear":
             mask = torch.linspace(1, 0, steps=width, device=device).view(1, 1, 1, width)
         elif fusion_mode == "gaussian":
-            sigma = fusion_param if fusion_param is not None else 0.2
-            x_lin = torch.linspace(0, 1, steps=width, device=device)
-            mask = torch.exp(-0.5 * ((x_lin - 0.0) / sigma) ** 2).view(1, 1, 1, width)
+            sharpness = 20.0 
+            
+            x_lin = torch.linspace(1, 0, steps=width, device=device)
+            mask = torch.exp(sharpness * (x_lin - 0.5)) / (torch.exp(sharpness * (x_lin-0.5))+1).view(1, 1, 1, width)
+            
+            # sigma = fusion_param if fusion_param is not None else 0.2
+            # mask = torch.exp(-0.5 * ((x_lin - 0.0) / sigma) ** 2).view(1, 1, 1, width)
         else:
             raise ValueError("fusion_mode must be either 'linear' or 'gaussian'")
 
