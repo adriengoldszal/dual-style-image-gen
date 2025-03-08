@@ -123,3 +123,18 @@ def total_variation(image):
     tv = torch.sum(tv_h) + torch.sum(tv_v)
     
     return tv.item()
+
+def extract_style_from_description(description):
+
+    description_lower = description.lower()
+    
+    if "mosaic" in description_lower:
+        return "MOSAIC"
+    elif "minecraft" in description_lower:
+        return "MINECRAFT"
+    elif "andy warhol" in description_lower or "warhol" in description_lower:
+        return "ANDY WARHOL POP"
+    elif "van gogh" in description_lower or "gogh" in description_lower:
+        return "VAN GOGH"
+    else:
+        return "UNKNOWN"
