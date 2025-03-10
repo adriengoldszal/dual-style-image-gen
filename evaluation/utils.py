@@ -111,17 +111,22 @@ def calculate_lpips(img1, img2):
     
     return dist.item()
 
-def total_variation(image):
+def total_variation_center_width(image):
     image = image.float()
+    channels, height, width = image.shape
+
+    start = int(width/2 - 0.1 * width)
+    end = int(width/2 + 0.1 * width)
     
-    diff_h = image[:, :, 1:] - image[:, :, :-1]
-    diff_v = image[:, 1:, :] - image[:, :-1, :]
+    sub_image = image[:, :, start:end]
     
-    tv_h = torch.sqrt(diff_h ** 2 + 1e-6)  
+    diff_h = sub_image[:, :, 1:] - sub_image[:, :, :-1]
+    diff_v = sub_image[:, 1:, :] - sub_image[:, :-1, :]
+    
+    tv_h = torch.sqrt(diff_h ** 2 + 1e-6)
     tv_v = torch.sqrt(diff_v ** 2 + 1e-6)
     
     tv = torch.sum(tv_h) + torch.sum(tv_v)
-    
     return tv.item()
 
 def extract_style_from_description(description):

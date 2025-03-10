@@ -3,7 +3,7 @@ import torch
 from tqdm import tqdm
 import pandas as pd
 from model.energy.clean_clip import DirectionalCLIP
-from .utils import save_image, calculate_ssim, calculate_psnr, calculate_lpips, total_variation, extract_style_from_description
+from .utils import save_image, calculate_ssim, calculate_psnr, calculate_lpips, total_variation_center_width, extract_style_from_description
 from .gram import compute_style_similarity
 
 class Evaluator(object):
@@ -114,8 +114,8 @@ class Evaluator(object):
             
             lpips = calculate_lpips(img, original_img)
             
-            total_variation_original = total_variation(original_img)
-            total_variation_generated = total_variation(img)
+            total_variation_original = total_variation_center_width(original_img)
+            total_variation_generated = total_variation_center_width(img)
             
             style_left = extract_style_from_description(decode_text_left)
             style_right = extract_style_from_description(decode_text_right)
