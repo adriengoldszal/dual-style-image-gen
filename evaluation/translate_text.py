@@ -3,8 +3,8 @@ import torch
 from tqdm import tqdm
 import pandas as pd
 from model.energy.clean_clip import DirectionalCLIP
-from .utils import save_image, calculate_ssim, calculate_psnr
-
+from .utils import save_image, calculate_ssim, calculate_psnr, calculate_lpips, total_variation_center_width, extract_style_from_description
+from .gram import compute_style_similarity
 
 class Evaluator(object):
 
@@ -57,6 +57,8 @@ class Evaluator(object):
             'psnr': [],
             'ssim': [],
             'l2': [],
+            'style_right' : [],
+            'style_left' : [],
         }
         idx = 0
         for original_img, img in tqdm(images):
@@ -109,6 +111,18 @@ class Evaluator(object):
                 ((img - original_img) ** 2).sum(2).sum(1).sum(0)
             ).item()
             all_l2 += l2
+            
+            lpips = calculate_lpips(img, original_img)
+            
+            total_variation_original = total_variation_center_width(original_img)
+            total_variation_generated = total_variation_center_width(img)
+            
+            style_left = extract_style_from_description(decode_text_left)
+            style_right = extract_style_from_description(decode_text_right)
+            print(f'Style left {style_left}, style right {style_right}')
+            
+            style_left_score = compute_style_similarity(img, style_left)
+            style_right_score = compute_style_similarity(img, style_right)
 
             print('clip_score: {}'.format(clip_score))
             print('dclip_score: {}'.format(dclip_score))
@@ -119,6 +133,12 @@ class Evaluator(object):
             print('psnr: {}'.format(psnr))
             print('ssim: {}'.format(ssim))
             print('l2: {}'.format(l2))
+            print('lpips: {}'.format(lpips))
+            print('total_variation_original: {}'.format(total_variation_original))
+            print('total_variation_generated: {}'.format(total_variation_generated))
+            print('delta_total_variation: {}'.format(total_variation_generated - total_variation_original))
+            print(f'Style left {style_left} score {style_left_score}')
+            print(f'Style right {style_right} score {style_right_score}')
             print('-' * 50)
 
             sample_results['encode_text'].append(encode_text)
@@ -133,6 +153,8 @@ class Evaluator(object):
             sample_results['psnr'].append(psnr)
             sample_results['ssim'].append(ssim)
             sample_results['l2'].append(l2)
+            sample_results['style_right'].append(style_right)
+            sample_results['style_left'].append(style_left)
 
             assert img.shape == original_img.shape
             save_image(os.path.join(f_gen, '{}.png'.format(idx)), img)
