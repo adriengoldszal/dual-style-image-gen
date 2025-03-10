@@ -1,2 +1,2 @@
-encode_text,decode_text,clip,dclip,psnr,ssim,l2
-A picture of a grey bedroom.,"A Van Gogh-style painting of a grey bedroom, with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night.",0.26899921894073486,0.04676126316189766,17.231266021728516,0.6834303950965913,121.9740219116211
+encode_text,decode_text,clip,dclip,psnr,ssim,l2,style_right,style_left
+A picture of a grey bedroom.,"A Van Gogh-style painting of a grey bedroom, with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night.",0.26899921894073486,0.04676126316189766,17.231266021728516,0.6834303950965913,121.9740219116211,MINECRAFT,VAN GOGH

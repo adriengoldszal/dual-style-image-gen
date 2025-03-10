@@ -1,7 +1,9 @@
 [
     {
         "encode_text": "A picture of a grey bedroom.",
-        "decode_text": "A Minecraft-inspired rendering of a grey bedroom, featuring distinct pixelated 16x16 textures, blocky 3D cube structures, limited color palette with no gradients, sharp right angles and perfect squares, characteristic voxel-based terrain with visible block edges.",
+        "decode_text": "a grey bedroom, Minecraft-inspired with blocky 3D cube structures on the left and a Van Gogh-style with bold, swirling brushstrokes on the right",
+        "style_left": "MINECRAFT",
+        "style_right": "VAN GOGH",
         "img_path": "./data/prompt2prompt/image_8.png"
     }
 ]

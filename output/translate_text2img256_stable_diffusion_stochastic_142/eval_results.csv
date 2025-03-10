@@ -1,2 +1,2 @@
-encode_text,decode_text,clip,dclip,psnr,ssim,l2
-A picture of a grey bedroom.,"A Minecraft-inspired rendering of a grey bedroom, featuring distinct pixelated 16x16 textures, blocky 3D cube structures, limited color palette with no gradients, sharp right angles and perfect squares, characteristic voxel-based terrain with visible block edges.",0.35045066475868225,0.17686967551708221,17.105392456054688,0.6482649853914202,123.75447845458984
+encode_text,decode_text,clip,dclip,psnr,ssim,l2,style_right,style_left
+A picture of a grey bedroom.,"a grey bedroom, Minecraft-inspired with blocky 3D cube structures on the left and a Van Gogh-style with bold, swirling brushstrokes on the right",0.37268316745758057,0.1952352672815323,16.117740631103516,0.5906278509381359,138.65757751464844,VAN GOGH,MINECRAFT

@@ -34,7 +34,7 @@ def save_interpolated_image(img, save_path):
     print(f"Saved interpolated image to {save_path}")
     return save_path
 
-def main(encode_img, encode_text, decode_text, interpol_type):
+def main(encode_img, encode_text, decode_text, interpol_type, style_right, style_left):
     
     # Load images
     encode_img = Image.open(encode_img).convert('RGB')
@@ -63,7 +63,9 @@ def main(encode_img, encode_text, decode_text, interpol_type):
     # Create dummy data for the evaluator
     dummy_data = [{
         'encode_text': encode_text,
-        'decode_text': decode_text
+        'decode_text': decode_text,
+        'style_right': style_right,
+        'style_left':style_left,
     }]
     class MetaArgs:
         def __init__(self):
@@ -100,6 +102,8 @@ if __name__ == "__main__":
     encode_text = item["encode_text"]
     decode_text = item["decode_text"]
     encode_img = item["encode_img"]
+    style_right = item["style_right"]
+    style_left = item["style_left"]
     
     base_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -108,4 +112,4 @@ if __name__ == "__main__":
     print(f"Decode text: {decode_text}")
     print(f"Encode_img: {encode_img}")
     
-    main(encode_img, encode_text, decode_text, interpol_type)
+    main(encode_img, encode_text, decode_text, interpol_type, style_right, style_left)

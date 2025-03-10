@@ -61,6 +61,12 @@ class DevDataset(Dataset):
         # Add decode text.
         data["decode_text"] = data['meta']['decode_text']
         data["model_kwargs"] = data["model_kwargs"] + ["decode_text", ]
+        
+        data["style_left"] = data['meta']['style_left']
+        data["model_kwargs"] = data["model_kwargs"] + ["style_left", ]
+        
+        data["style_right"] = data['meta']['style_right']
+        data["model_kwargs"] = data["model_kwargs"] + ["style_right", ]
 
         # Add original image.
         data['original_image'] = img
