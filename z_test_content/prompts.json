@@ -1,0 +1,23 @@
+{
+    "comment": "Prompts for decode text. When using for encoding, just take the part after 'A picture of'.",
+    "image_1": "A picture of a red car and white sheep",
+    "image_2": "A picture of an astronaut riding a horse",
+    "image_3": "A picture of a red bag on a grey rock",
+    "image_4": "A picture of a black bear walking on grass",
+    "image_5": "A picture of a grey cat sitting on a wood plank",
+    "image_6": "A picture of a dog lying on the street",
+    "image_7": "A picture of blooming red tulips",
+    "image_8": "A picture of a grey bedroom",
+    "image_9": "A picture of a bedroom with green walls and white bed",
+    "image_10": "A picture of two hikers in front of a mountain",
+    "image_11": "A picture of a red brick house façade",
+    "image_12": "A picture of a young girl smiling",
+    "image_13": "A picture of a lighthouse",
+    "image_14": "A picture of a fisherman holding a crab trap",
+    "image_15": "A picture of a batch of red and green peppers",
+    "image_16": "A picture of a shark head in the blue ocean",
+    "image_17": "A picture of a kitchen stovetop",
+    "image_18": "A picture of a synthwave sports car",
+    "image_19": "A picture of a tennis player serving",
+    "image_20": "A picture of trees in a valley with blue sky"
+}

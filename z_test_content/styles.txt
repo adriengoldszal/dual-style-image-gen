@@ -1,0 +1,4 @@
+MOSAIC : A highly detailed mosaic of [prompt], made of small, colorful tiles with visible grout lines, creating a textured and handcrafted appearance
+MINECRAFT : A Minecraft-inspired rendering of [prompt], featuring distinct pixelated 16x16 textures, blocky 3D cube structures, limited color palette with no gradients, sharp right angles and perfect squares, characteristic voxel-based terrain with visible block edges.
+ANDY WARHOL POP : A vibrant Andy Warhol-style pop art image of [prompt], featuring bold, contrasting colors, high saturation, thick outlines, and a repeated or silkscreen-like print effect.
+VAN GOGH : A Van Gogh-style painting of [prompt], with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night

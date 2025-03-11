@@ -1,0 +1,123 @@
+Image 1 
+
+clip_score: 0.3608531951904297
+dclip_score: 0.11724108457565308
+clip_score_right: 0.3855198621749878
+dclip_score_right: 0.10288581252098083
+clip_score_left: 0.34954553842544556
+dclip_score_left: 0.11173012852668762
+psnr: 13.757954597473145
+ssim: 0.42153293702778855
+l2: 181.9419403076172
+lpips: 0.5621382594108582
+total_variation_original: 5857.736328125
+total_variation_generated: 4333.34765625
+delta_total_variation: -1524.388671875
+Style left MOSAIC score 486.83056640625
+Style right ANDY WARHOL POP score 549.7593383789062
+
+Image 2 
+
+clip_score: 0.3423537015914917
+dclip_score: 0.1048855185508728
+clip_score_right: 0.3736726939678192
+dclip_score_right: 0.14998917281627655
+clip_score_left: 0.3285532593727112
+dclip_score_left: 0.11798564344644547
+psnr: 11.003950119018555
+ssim: 0.4549719218480785
+l2: 249.8234100341797
+lpips: 0.5003354549407959
+total_variation_original: 7451.76611328125
+total_variation_generated: 14390.21484375
+delta_total_variation: 6938.44873046875
+Style left MOSAIC score 462.0954284667969
+Style right ANDY WARHOL POP score 521.5199584960938
+
+Image 3 
+
+clip_score: 0.2753031253814697
+dclip_score: 0.00785297155380249
+clip_score_right: 0.31883466243743896
+dclip_score_right: 0.08172373473644257
+clip_score_left: 0.27819833159446716
+dclip_score_left: 0.040389128029346466
+psnr: 13.837522506713867
+ssim: 0.5541731859039222
+l2: 180.28286743164062
+lpips: 0.5157431364059448
+total_variation_original: 3690.4091796875
+total_variation_generated: 5503.46875
+delta_total_variation: 1813.0595703125
+Style left MOSAIC score 487.7418212890625
+Style right ANDY WARHOL POP score 551.6273803710938
+
+Image 4 
+clip_score: 0.3254621624946594
+dclip_score: 0.07902573049068451
+clip_score_right: 0.3420286774635315
+dclip_score_right: 0.12976640462875366
+clip_score_left: 0.383178174495697
+dclip_score_left: 0.13509225845336914
+psnr: 11.71121597290039
+ssim: 0.21816406555088788
+l2: 230.28720092773438
+lpips: 0.6203442811965942
+total_variation_original: 5151.4931640625
+total_variation_generated: 10912.0693359375
+delta_total_variation: 5760.576171875
+Style left MOSAIC score 461.7535705566406
+Style right ANDY WARHOL POP score 525.75
+
+Image 5 
+
+clip_score: 0.33079302310943604
+dclip_score: 0.07013062387704849
+clip_score_right: 0.33321091532707214
+dclip_score_right: 0.10814416408538818
+clip_score_left: 0.3255009651184082
+dclip_score_left: 0.10986647009849548
+psnr: 15.354595184326172
+ssim: 0.6970119866406771
+l2: 151.39126586914062
+lpips: 0.48423105478286743
+total_variation_original: 4200.57568359375
+total_variation_generated: 8222.970703125
+delta_total_variation: 4022.39501953125
+Style left MOSAIC score 493.7509460449219
+Style right ANDY WARHOL POP score 559.2814331054688
+
+Image 7 
+
+clip_score: 0.310905396938324
+dclip_score: 0.14859116077423096
+clip_score_right: 0.30980074405670166
+dclip_score_right: 0.07908651977777481
+clip_score_left: 0.3133555054664612
+dclip_score_left: 0.10305207967758179
+psnr: 10.09300708770752
+ssim: 0.27397769046927994
+l2: 277.4471130371094
+lpips: 0.7270795106887817
+total_variation_original: 5932.2685546875
+total_variation_generated: 8290.1171875
+delta_total_variation: 2357.8486328125
+Style left MOSAIC score 457.7409362792969
+Style right ANDY WARHOL POP score 517.0344848632812
+
+Image 8 
+clip_score: 0.30938035249710083
+dclip_score: 0.08105725049972534
+clip_score_right: 0.33098864555358887
+dclip_score_right: 0.11342015862464905
+clip_score_left: 0.295859694480896
+dclip_score_left: 0.04020246863365173
+psnr: 17.24721908569336
+ssim: 0.627464363074988
+l2: 121.75019836425781
+lpips: 0.4614366590976715
+total_variation_original: 2392.543701171875
+total_variation_generated: 4923.84521484375
+delta_total_variation: 2531.301513671875
+Style left MOSAIC score 493.8063049316406
+Style right ANDY WARHOL POP score 559.0386352539062

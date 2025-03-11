@@ -1,0 +1,131 @@
+Image 1 
+
+clip_score: 0.3170689344406128
+dclip_score: 0.14555679261684418
+clip_score_right: 0.25398802757263184
+dclip_score_right: 0.025451255962252617
+clip_score_left: 0.31237560510635376
+dclip_score_left: 0.044179584830999374
+psnr: 11.675416946411133
+ssim: 0.316792470604579
+l2: 231.23828125
+lpips: 0.6153050065040588
+total_variation_original: 5857.736328125
+total_variation_generated: 5297.32470703125
+delta_total_variation: -560.41162109375
+Style left MINECRAFT score 375.0643615722656
+Style right VAN GOGH score 117.56380462646484
+
+Image 2 
+
+clip_score: 0.3265085518360138
+dclip_score: 0.15183837711811066
+clip_score_right: 0.246118426322937
+dclip_score_right: 0.08377736061811447
+clip_score_left: 0.40032607316970825
+dclip_score_left: 0.21843326091766357
+psnr: 12.880922317504883
+ssim: 0.7057204388774047
+l2: 201.2725067138672
+lpips: 0.38353854417800903
+total_variation_original: 7451.76611328125
+total_variation_generated: 7024.08984375
+delta_total_variation: -427.67626953125
+Style left MINECRAFT score 363.1009826660156
+Style right VAN GOGH score 114.18470001220703
+
+Image 3 
+
+clip_score: 0.3072272539138794
+dclip_score: 0.09784317761659622
+clip_score_right: 0.2959888279438019
+dclip_score_right: 0.06424508988857269
+clip_score_left: 0.35638517141342163
+dclip_score_left: 0.12337236851453781
+psnr: 14.343060493469238
+ssim: 0.5342803844683176
+l2: 170.0895233154297
+lpips: 0.598721981048584
+total_variation_original: 3690.4091796875
+total_variation_generated: 4982.86083984375
+delta_total_variation: 1292.45166015625
+Style left MINECRAFT score 374.1455078125
+Style right VAN GOGH score 114.35164642333984
+
+Image 4 
+
+clip_score: 0.37946730852127075
+dclip_score: 0.1942158043384552
+clip_score_right: 0.3937351703643799
+dclip_score_right: 0.23282532393932343
+clip_score_left: 0.32804441452026367
+dclip_score_left: 0.12326422333717346
+psnr: 12.133810043334961
+ssim: 0.3093501187759455
+l2: 219.35121154785156
+lpips: 0.5630766153335571
+total_variation_original: 5151.4931640625
+total_variation_generated: 6755.36865234375
+delta_total_variation: 1603.87548828125
+Style left MINECRAFT score 369.5179138183594
+Style right VAN GOGH score 111.1144027709961
+
+Image 5 
+
+clip_score: 0.3161519169807434
+dclip_score: 0.01948413997888565
+clip_score_right: 0.23868456482887268
+dclip_score_right: -0.05473360791802406
+clip_score_left: 0.3736422657966614
+dclip_score_left: 0.1406993418931961
+psnr: 15.264013290405273
+ssim: 0.7370396072743831
+l2: 152.9783477783203
+lpips: 0.5318935513496399
+total_variation_original: 4200.57568359375
+total_variation_generated: 3751.30810546875
+delta_total_variation: -449.267578125
+Style left MINECRAFT score 381.1534118652344
+Style right VAN GOGH score 121.62060546875
+
+Image 7 
+
+Similarity with van_gogh_2.jpg: 103.80745697021484
+Similarity with van_gogh_3.jpg: 113.97247314453125
+Similarity with van_gogh_1.jpeg: 105.21631622314453
+clip_score: 0.3062472939491272
+dclip_score: 0.1517529934644699
+clip_score_right: 0.29666823148727417
+dclip_score_right: 0.14800035953521729
+clip_score_left: 0.31763121485710144
+dclip_score_left: 0.15556325018405914
+psnr: 9.883536338806152
+ssim: 0.2940508547271686
+l2: 284.21942138671875
+lpips: 0.7476030588150024
+total_variation_original: 5932.2685546875
+total_variation_generated: 7355.9482421875
+delta_total_variation: 1423.6796875
+Style left MINECRAFT score 346.25341796875
+Style right VAN GOGH score 107.66541290283203
+
+Image 8 
+
+Similarity with van_gogh_2.jpg: 118.30553436279297
+Similarity with van_gogh_3.jpg: 134.00390625
+Similarity with van_gogh_1.jpeg: 113.24449920654297
+clip_score: 0.271879106760025
+dclip_score: 0.030603967607021332
+clip_score_right: 0.2517176866531372
+dclip_score_right: 0.026143644005060196
+clip_score_left: 0.29996028542518616
+dclip_score_left: 0.10379084944725037
+psnr: 21.919851303100586
+ssim: 0.7712241070363497
+l2: 71.09481811523438
+lpips: 0.35777437686920166
+total_variation_original: 2392.543701171875
+total_variation_generated: 2325.006591796875
+delta_total_variation: -67.537109375
+Style left MINECRAFT score 383.3839111328125
+Style right VAN GOGH score 121.851318359375
