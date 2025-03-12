@@ -1,9 +1,9 @@
 [
     {
-        "encode_text": "A picture of a grey bedroom.",
-        "decode_text": "a grey bedroom, Minecraft-inspired with blocky 3D cube structures on the left and a Van Gogh-style with bold, swirling brushstrokes on the right",
-        "style_left": "MINECRAFT",
-        "style_right": "VAN GOGH",
-        "img_path": "./data/prompt2prompt/image_8.png"
+        "encode_text": "A picture of a grey cat sitting on a wood plank",
+        "decode_text": " A vibrant Andy Warhol-style pop art image of a grey cat sitting on a wood plank, featuring bold, contrasting colors, high saturation, thick outlines, and a repeated or silkscreen-like print effect.",
+        "style_right": "MINECRAFT",
+        "style_left": "VAN GOGH",
+        "img_path": "./data/prompt2prompt/image_5.png"
     }
 ]
