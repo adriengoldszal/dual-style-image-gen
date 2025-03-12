@@ -22,7 +22,7 @@ def interpolate_images(img1, img2, interpol_type):
     # Interpolate between the images using the weights
     
     if interpol_type == 'exp' : 
-        sharpness = 50.0 
+        sharpness = 20.0 
         interpolation_weights = torch.exp(sharpness * (interpolation_weights - 0.5)) / (torch.exp(sharpness * (interpolation_weights - 0.5)) + 1)
     interpolated = img1.unsqueeze(0) * (1 - interpolation_weights) + img2.unsqueeze(0) * interpolation_weights
     
@@ -34,14 +34,14 @@ def save_interpolated_image(img, save_path):
     print(f"Saved interpolated image to {save_path}")
     return save_path
 
-def main(encode_img, encode_text, decode_text, interpol_type, style_right, style_left):
+def main(encode_img, encode_text, decode_text_total,decode_text_right, decode_text_left, interpol_type, style_right, style_left):
     
     # Load images
     encode_img = Image.open(encode_img).convert('RGB')
     print(f"encode_img size: {encode_img.size}")
     print(type(encode_img))
-    img1 = Image.open("img1.png").convert('RGB')
-    img2 = Image.open("img2.png").convert('RGB')
+    img1 = Image.open("images/minecraft/image_7.png").convert('RGB')
+    img2 = Image.open("images/van gogh/image_7.png").convert('RGB')
 
     # Same transform as preprocessor
     transform = transforms.Compose([
@@ -63,7 +63,9 @@ def main(encode_img, encode_text, decode_text, interpol_type, style_right, style
     # Create dummy data for the evaluator
     dummy_data = [{
         'encode_text': encode_text,
-        'decode_text': decode_text,
+        'decode_text_total': decode_text_total,
+        'decode_text_left' : decode_text_left,
+        'decode_text_right' : decode_text_right,
         'style_right': style_right,
         'style_left':style_left,
     }]
@@ -91,6 +93,7 @@ def main(encode_img, encode_text, decode_text, interpol_type, style_right, style
 if __name__ == "__main__":
     
     interpol_type = 'exp'
+    #interpol_type = 'nimp'
     
     with open('prompts.json', 'r') as file:
         data = json.load(file)
@@ -100,7 +103,9 @@ if __name__ == "__main__":
 
     # Now you can access each property
     encode_text = item["encode_text"]
-    decode_text = item["decode_text"]
+    decode_text_total = item["decode_text_total"]
+    decode_text_right = item["decode_text"]["right_prompt"]
+    decode_text_left = item["decode_text"]["left_prompt"]
     encode_img = item["encode_img"]
     style_right = item["style_right"]
     style_left = item["style_left"]
@@ -109,7 +114,7 @@ if __name__ == "__main__":
 
     # Print the values to verify
     print(f"Encode text: {encode_text}")
-    print(f"Decode text: {decode_text}")
+    print(f"Decode text: {decode_text_total}")
     print(f"Encode_img: {encode_img}")
     
-    main(encode_img, encode_text, decode_text, interpol_type, style_right, style_left)
+    main(encode_img, encode_text, decode_text_total,decode_text_right, decode_text_left, interpol_type, style_right, style_left)

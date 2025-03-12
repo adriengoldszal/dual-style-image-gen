@@ -1,9 +1,13 @@
 [
     {
-        "encode_text": "A picture of a grey bedroom.",
-        "decode_text": "A Van Gogh-style painting of a grey bedroom, with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night.",
-        "style_left": "VAN GOGH",
-        "style_right": "MINECRAFT",
-        "encode_img": "image_8.png"
+        "encode_text": "A picture of blooming red tulips",
+        "decode_text": {
+            "left_prompt": "A Minecraft-inspired rendering of blooming red tulips, featuring distinct pixelated 16x16 textures, blocky 3D cube structures, limited color palette with no gradients, sharp right angles and perfect squares, characteristic voxel-based terrain with visible block edges.",
+            "right_prompt": "A Van Gogh-style painting of blooming red tulips, with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night"
+        },
+        "decode_text_total": "A picture of blooming red tulips, as a van gogh style painting on the right and a Minecraft blocky style on the left.",
+        "style_left": "MINECRAFT",
+        "style_right": "VAN GOGH",
+        "encode_img": "image_7.png"
     }
 ]
