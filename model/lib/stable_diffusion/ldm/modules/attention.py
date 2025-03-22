@@ -194,7 +194,7 @@ class CrossAttention(nn.Module):
                 x_weights = x_coords.repeat(width, 1).reshape(-1)
                 x_weights = x_weights.unsqueeze(0).repeat(b, 1)
                 
-                sharpness = 100.0 
+                sharpness = 30.0 
                 x_weights = torch.exp(sharpness * (x_weights - 0.5)) / (torch.exp(sharpness * (x_weights - 0.5)) + 1)
 
                 # Rearrange tensors for attention computation

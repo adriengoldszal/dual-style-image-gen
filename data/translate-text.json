@@ -1,11 +1,11 @@
 [
     {
-        "encode_text": "A picture of a grey bedroom",
+        "encode_text": "A picture of a black bear walking on grass",
         "decode_text": {
-            "left_prompt": " A Minecraft-inspired rendering a grey bedroom, featuring blocky 3D cube structures, limited color palette with no gradients, sharp right angles and perfect squares, characteristic voxel-based terrain with visible block edges.",
-            "right_prompt": "A Van Gogh-style painting a grey bedroom, with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night"
+            "left_prompt": " A Minecraft-inspired rendering a black bear walking on grass, featuring blocky 3D cube structures, limited color palette with no gradients, sharp right angles and perfect squares, characteristic voxel-based terrain with visible block edges.",
+            "right_prompt": "A Van Gogh-style painting a black bear walking on grass, with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night"
         },
         "decode_text_total": "An Andy Warhol pop style drawing on the right and a minecraft style painting on the left of a grey bedroom.",
-        "img_path": "./data/prompt2prompt/image_8.png"
+        "img_path": "./data/prompt2prompt/image_4.png"
     }
 ]
