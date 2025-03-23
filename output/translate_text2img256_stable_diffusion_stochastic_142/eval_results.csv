@@ -1,2 +1,2 @@
 encode_text,decode_text,clip,dclip,psnr,ssim,l2,style_right,style_left
-A picture of blooming red tulips,"A Minecraft-inspired rendering of blooming red tulips, featuring distinct pixelated 16x16 textures, blocky 3D cube structures, limited color palette with no gradients, sharp right angles and perfect squares, characteristic voxel-based terrain with visible block edges.",0.3739597201347351,0.2248203009366989,11.553596496582031,0.36365002805161845,234.50428771972656,MINECRAFT,VAN GOGH
+A picture of a black bear walking on grass, A minecraft style black bear walking on grass on the left and a van gogh style black bear walking on grass on the right,0.35095566511154175,0.1634739339351654,14.219489097595215,0.4931289737221265,172.52662658691406,MINECRAFT,VAN GOGH
