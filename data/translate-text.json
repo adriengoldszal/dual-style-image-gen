@@ -1,8 +1,8 @@
 [
     {
         "encode_text": "A black bear is walking in the grass.",
-        "decode_text_left": "A van gogh style painting of a black bear walking in the grass.",
-        "decode_text_right": "A minecraft style painting of a black bear walking in the grass.",
+        "decode_text_left": "A Minecraft-inspired rendering of a black bear walking in the grass, featuring distinct pixelated textures, blocky 3D cube structures, limited color palette with no gradients, sharp right angles and perfect squares, characteristic voxel-based terrain with visible block edges",
+        "decode_text_right": "A Van Gogh-style painting of a black bear walking in the grass, with bold, swirling brushstrokes, rich textures, and vibrant, expressive colors reminiscent of Starry Night.",
         "decode_text": "A van gogh style painting on the left and a minecraft style painting on the right of a black bear walking in the grass.",
         "img_path": "./data/prompt2prompt/bear.png"
     }
