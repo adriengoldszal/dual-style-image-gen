@@ -69,7 +69,7 @@ pip install git+https://github.com/openai/CLIP.git
 ```
 
 2. Install `torch` and `torchvision` based on your CUDA version.
-3. Install [taming-transformers](https://github.com/CompVis/taming-transformers) by running
+3. Install [taming-transformers](https://github.com/CompVis/taming-transformers) by running:
 
 ```shell
 cd ../
